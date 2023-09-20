@@ -10,7 +10,7 @@ namespace MauiAppVisit.ViewModel
 {
     public partial class LocationDetailsViewModel : ObservableObject
     {
-        private string id;
+        private int id;
         private List<LocationDetails> locationDetails = new List<LocationDetails>();
 
         [ObservableProperty]
@@ -21,7 +21,7 @@ namespace MauiAppVisit.ViewModel
 
         public LocationDetailsViewModel(string id)
         {
-            this.id = id;
+            this.id = Convert.ToInt32(id);
             CriarBaseParaTeste();
             GetLocationDetailsById();
         }
@@ -46,8 +46,8 @@ namespace MauiAppVisit.ViewModel
 
         private void GetLocationDetailsById()
         {
-            DescriptionPlace = locationDetails.Where(x => x.Id.Equals(id)).Select(x => x.DescriptionPlace).FirstOrDefault();
-            ImagePlaceByte = Convert.FromBase64String(locationDetails.Where(x => x.Id.Equals(id)).Select(x => x.ImagePlace).FirstOrDefault());
+            DescriptionPlace = locationDetails.Where(x => x.Id == id).Select(x => x.DescriptionPlace).FirstOrDefault();
+            ImagePlaceByte = Convert.FromBase64String(locationDetails.Where(x => x.Id == id).Select(x => x.ImagePlace).FirstOrDefault());
         }
     }
 }
