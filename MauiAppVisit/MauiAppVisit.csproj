@@ -53,8 +53,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="View\" />
-	  <Folder Include="ViewModel\" />
+	  <MauiXaml Update="View\DetailsPlace.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
