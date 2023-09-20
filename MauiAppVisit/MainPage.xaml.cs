@@ -8,7 +8,7 @@
         {
             InitializeComponent();
         }
-        //teste
+
         private void OnCounterClicked(object sender, EventArgs e)
         {
             count++;
