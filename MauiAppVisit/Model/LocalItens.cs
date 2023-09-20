@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MauiAppVisit.Model
 {
-    public class LocalItens
+    public class LocationItens
     {
         public int Id { get; set; }
         public string PlaceName { get; set; }

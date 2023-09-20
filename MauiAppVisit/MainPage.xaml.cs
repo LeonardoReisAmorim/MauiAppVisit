@@ -1,24 +1,20 @@
-﻿namespace MauiAppVisit
+﻿using MauiAppVisit.View;
+using MauiAppVisit.ViewModel;
+
+namespace MauiAppVisit
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
-
         public MainPage()
         {
             InitializeComponent();
+            BindingContext = new LocalItensViewModel();
         }
 
-        private void OnCounterClicked(object sender, EventArgs e)
+        private void ImageButton_Clicked(object sender, EventArgs e)
         {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            var imageButton = (ImageButton)sender;
+            Navigation.PushAsync(new LocationDetailsView(imageButton.CommandParameter.ToString()));
         }
     }
 }
