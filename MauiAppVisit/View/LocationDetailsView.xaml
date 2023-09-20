@@ -10,7 +10,7 @@
             HorizontalOptions="Center" />
 
         <Image
-            Source="{Binding ImagePlace}"
+            Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
             HeightRequest="100"/>
 
         <Button

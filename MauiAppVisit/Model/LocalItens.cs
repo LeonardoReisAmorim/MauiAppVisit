@@ -11,5 +11,6 @@ namespace MauiAppVisit.Model
         public int Id { get; set; }
         public string PlaceName { get; set; }
         public string ImagePlace { get; set; }
+        public byte[] ImagePlaceByte { get; set; }
     }
 }
