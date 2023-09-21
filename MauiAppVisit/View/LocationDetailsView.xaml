@@ -2,26 +2,46 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiAppVisit.View.LocationDetailsView"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             Title="V I S I T">
     
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    
-    <VerticalStackLayout>
+
+    <Grid
+        Padding="10">
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="150"/>
+        </Grid.RowDefinitions>
+
         <Label 
             Text="{Binding DescriptionPlace}"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+            VerticalOptions="Start" 
+            HorizontalOptions="Start"
+            FontSize="15"
+            Grid.Row="0"
+            Margin="0, 50, 0, 0"/>
 
         <Image
             Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-            HeightRequest="100"/>
+            Aspect="AspectFill"
+            HeightRequest="300"
+            Grid.Row="1"/>
 
         <Button
             Text="VISITAR LOCAL"
-            Clicked="Button_Clicked"/>
-    </VerticalStackLayout>
+            Clicked="Button_Clicked"
+            HeightRequest="50"
+            WidthRequest="200"
+            CornerRadius="10"
+            BackgroundColor="#10B5BF"
+            TextColor="White"
+            Grid.Row="2"/>
+    </Grid>
 </ContentPage>
