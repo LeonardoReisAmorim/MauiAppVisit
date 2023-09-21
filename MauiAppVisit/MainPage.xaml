@@ -11,44 +11,57 @@
     </ContentPage.Resources>
     
     <ScrollView>
-        <VerticalStackLayout
-            Spacing="25"
-            Padding="30,0"
-            VerticalOptions="Center">
+        <Grid
+            RowSpacing="40"
+            Padding="5">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
+            <BoxView Grid.Row="0" Color="#10B5BF"/>
             <Label
                 Text="V I S I T"
                 FontSize="40"
                 HorizontalOptions="Center"
-                BackgroundColor="#10B5BF"/>
+                TextColor="White"
+                />
 
             <Label
                 Text="Escolha o lugar para visitar clicando na imagem"
                 FontSize="28"
-                HorizontalOptions="Center" />
+                HorizontalTextAlignment="Center"
+                Grid.Row="1"/>
 
-            <CollectionView ItemsSource="{Binding LocationItens}">
+            <CollectionView 
+                ItemsSource="{Binding LocationItens}"
+                Grid.Row="2">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <VerticalStackLayout>
-                            <ImageButton
-                                Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                Aspect="AspectFill"
-                                HeightRequest="100"
-                                CommandParameter="{Binding Id}"
-                                Clicked="ImageButton_Clicked"/>
-
+                        <VerticalStackLayout
+                            Margin="15">
                             <Label 
                                 FontSize="Large"
                                 FontAttributes="Bold"
-                                Text="{Binding PlaceName}"/>
+                                Text="{Binding PlaceName}"
+                                HorizontalOptions="Center"/>
+
+                            <ImageButton
+                                Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                Aspect="AspectFill"
+                                HeightRequest="300"
+                                CommandParameter="{Binding Id}"
+                                Clicked="ImageButton_Clicked"
+                                CornerRadius="10"/>
                         </VerticalStackLayout>
                         
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-        </VerticalStackLayout>
+        </Grid>
     </ScrollView>
 
 </ContentPage>
