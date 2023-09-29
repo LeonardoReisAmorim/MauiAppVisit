@@ -28,7 +28,7 @@
                 Grid.Row="0"/>
 
             <CollectionView 
-                ItemsSource="{Binding LocationItens}"
+                ItemsSource="{Binding Lugares}"
                 Grid.Row="1">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -37,14 +37,14 @@
                             <Label 
                                 FontSize="Large"
                                 FontAttributes="Bold"
-                                Text="{Binding PlaceName}"
+                                Text="{Binding nome}"
                                 HorizontalOptions="Center"/>
 
                             <ImageButton
-                                Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                Source="{Binding ImagemByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                 Aspect="AspectFill"
                                 HeightRequest="300"
-                                CommandParameter="{Binding Id}"
+                                CommandParameter="{Binding id}"
                                 Clicked="ImageButton_Clicked"
                                 CornerRadius="10"/>
                         </VerticalStackLayout>
