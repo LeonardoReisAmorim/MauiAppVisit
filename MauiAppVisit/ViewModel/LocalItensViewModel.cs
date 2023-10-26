@@ -9,7 +9,7 @@ namespace MauiAppVisit.ViewModel
     {
         readonly HttpClient _httpClient;
         readonly JsonSerializerOptions _serializerOptions;
-        readonly string baseUrl = "http://10.0.2.2:5241";
+        readonly string baseUrl = "http://10.0.2.2:5000";
 
         [ObservableProperty]
         public ObservableCollection<Lugar> _lugares; 
