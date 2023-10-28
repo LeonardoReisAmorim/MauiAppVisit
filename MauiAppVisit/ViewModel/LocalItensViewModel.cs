@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -7,34 +8,24 @@ namespace MauiAppVisit.ViewModel
 {
     public partial class LocalItensViewModel : ObservableObject
     {
-        readonly HttpClient _httpClient;
-        readonly JsonSerializerOptions _serializerOptions;
-        readonly string baseUrl = "http://10.0.2.2:5000";
+        HttpHelper HttpHelper { get; set; }
 
         [ObservableProperty]
         public ObservableCollection<Lugar> _lugares; 
 
         public LocalItensViewModel()
         {
-            #if DEBUG
-                HttpsClientHandlerService handler = new HttpsClientHandlerService();
-                _httpClient = new HttpClient(handler.GetPlatformMessageHandler());
-            #else
-                _httpClient = new HttpClient();
-            #endif
-            _lugares = new ObservableCollection<Lugar>();
-            _serializerOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
+            HttpHelper = new HttpHelper();
             CarregaLugaresAsync();
         }
 
         private async void CarregaLugaresAsync()
         {
+            var baseUrl = HttpHelper.GetBaseUrl();
+            var htppClient = HttpHelper.GetHttpClient();
+
             var url = $"{baseUrl}/Lugar";
-            var response = await _httpClient.GetAsync(url);
+            var response = await htppClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
             {

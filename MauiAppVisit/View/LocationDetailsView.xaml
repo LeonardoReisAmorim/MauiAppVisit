@@ -36,12 +36,14 @@
 
         <Button
             Text="VISITAR LOCAL"
-            Clicked="Button_Clicked"
             HeightRequest="50"
             WidthRequest="200"
             CornerRadius="10"
             BackgroundColor="#10B5BF"
             TextColor="White"
-            Grid.Row="2"/>
+            Grid.Row="2"
+            Command="{Binding GetArquivoCommand}"/>
+
+        <ActivityIndicator IsRunning="{Binding Loading}" />
     </Grid>
 </ContentPage>

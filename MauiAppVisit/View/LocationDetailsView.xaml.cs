@@ -9,9 +9,4 @@ public partial class LocationDetailsView : ContentPage
 		InitializeComponent();
 		BindingContext = new LocationDetailsViewModel(id);
 	}
-
-    private void Button_Clicked(object sender, EventArgs e)
-    {
-
-    }
 }
