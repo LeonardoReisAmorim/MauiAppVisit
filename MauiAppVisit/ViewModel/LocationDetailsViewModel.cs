@@ -1,7 +1,13 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿#if ANDROID
+using Android;
+using Android.Content.PM;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
+#endif
+using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
-using Microsoft.Maui.Controls.PlatformConfiguration;
 using System.Text.Json;
 using System.Windows.Input;
 
@@ -56,28 +62,37 @@ namespace MauiAppVisit.ViewModel
 
         private async Task GetArquivoAsync()
         {
-            //Loading = "true";
-            //var baseUrl = HttpHelper.GetBaseUrl();
-            //var htppClient = HttpHelper.GetHttpClient();
+            Loading = "true";
+            var baseUrl = HttpHelper.GetBaseUrl();
+            var htppClient = HttpHelper.GetHttpClient();
+            var url = $"{baseUrl}/Arquivo/{Idarquivo}";
+            var response = await htppClient.GetAsync(url);
+            var arquivoBytes = Array.Empty<byte>();
+            var arquivo = new ArquivoDTO();
 
-            //var url = $"{baseUrl}/Arquivo/{Idarquivo}";
-            //var response = await htppClient.GetAsync(url);
+            //TODO - DESZIPAR POR CAUSA DO TAMANHO 
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                arquivo = JsonSerializer.Deserialize<ArquivoDTO>(responseContent);
+            }
+            arquivoBytes = Convert.FromBase64String(arquivo.arquivo);
 
-            ////TODO - ZIPAR E DESZIPAR POR CAUSA DO TAMANHO
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    var responseContent = await response.Content.ReadAsStringAsync();
-            //    var arquivo = JsonSerializer.Deserialize<ArquivoDTO>(responseContent);
+            // this will run for Android 33 and greater
+            if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+            #if ANDROID
+                var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
+                if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
+                {
+                    ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
+                }
+            #endif
+            }
 
-            //    var arquivoBytes = Convert.FromBase64String(arquivo.arquivo);
-
-                
-            //}
-
-            string mainDir = FileSystem.Current.AppDataDirectory;
-            var fullpatch = Path.Combine(mainDir, "teste.txt");
-            File.WriteAllText(fullpatch, "teste");
-
+            using var stream = new MemoryStream(arquivoBytes);
+            var fileSaverResult = await FileSaver.Default.SaveAsync("test.apk", stream, new CancellationToken());
+            var a = fileSaverResult.IsSuccessful;
             Loading = "false";
         }
     }
