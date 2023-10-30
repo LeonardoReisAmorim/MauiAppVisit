@@ -28,6 +28,9 @@ namespace MauiAppVisit.ViewModel
         private string _loading;
 
         [ObservableProperty]
+        private string _aviso;
+
+        [ObservableProperty]
         private byte[] _imagePlaceByte;
 
         public LocationDetailsViewModel(string Id)
@@ -35,6 +38,7 @@ namespace MauiAppVisit.ViewModel
             IdLugar = Convert.ToInt32(Id);
             HttpHelper = new HttpHelper();
             Loading = "false";
+            Aviso = "";
             GetLocationDetailsById();
         }
 
@@ -108,6 +112,7 @@ namespace MauiAppVisit.ViewModel
             using var stream = new MemoryStream(arquivoBytesZip);
             await FileSaver.Default.SaveAsync("teste.zip", stream, new CancellationToken());
             Loading = "false";
+            Aviso = "Após feita instalação do ambiente virtual em formato .zip. Serão necessários alguns passos:\n1 - Abrir o arquivo .zip;\n2 - Extrair o arquivo .apk e colocar na pasta desejada;\n3 - Excluir o arquivo .zip;\n4 - Instalar o arquivo .apk;\n5 - Se divirta!";
         }
     }
 }

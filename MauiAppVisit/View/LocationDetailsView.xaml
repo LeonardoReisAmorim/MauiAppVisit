@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="150"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Label 
@@ -26,7 +27,7 @@
             HorizontalOptions="Start"
             FontSize="15"
             Grid.Row="0"
-            Margin="0, 50, 0, 0"/>
+            Margin="0, 15, 0, 0"/>
 
         <Image
             Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
@@ -45,5 +46,12 @@
             Command="{Binding GetArquivoCommand}"/>
 
         <ActivityIndicator IsRunning="{Binding Loading}" />
+
+        <Label 
+            Text="{Binding Aviso}"
+            VerticalOptions="Start" 
+            HorizontalOptions="Start"
+            FontSize="15"
+            Grid.Row="3"/>  
     </Grid>
 </ContentPage>
