@@ -8,6 +8,7 @@ using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
+using System.IO.Compression;
 using System.Text.Json;
 using System.Windows.Input;
 
@@ -63,20 +64,34 @@ namespace MauiAppVisit.ViewModel
         private async Task GetArquivoAsync()
         {
             Loading = "true";
+            var arquivoBytesZip = Array.Empty<byte>();
+            var arquivoBytesApk = Array.Empty<byte>();
+            var arquivoZip = new ArquivoDTO();
+            var filenameApk = string.Empty;
             var baseUrl = HttpHelper.GetBaseUrl();
             var htppClient = HttpHelper.GetHttpClient();
+
             var url = $"{baseUrl}/Arquivo/{Idarquivo}";
             var response = await htppClient.GetAsync(url);
-            var arquivoBytes = Array.Empty<byte>();
-            var arquivo = new ArquivoDTO();
 
-            //TODO - DESZIPAR POR CAUSA DO TAMANHO 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                arquivo = JsonSerializer.Deserialize<ArquivoDTO>(responseContent);
+                arquivoZip = JsonSerializer.Deserialize<ArquivoDTO>(responseContent);
             }
-            arquivoBytes = Convert.FromBase64String(arquivo.arquivo);
+            arquivoBytesZip = Convert.FromBase64String(arquivoZip.arquivo);
+
+            //using (MemoryStream msZip = new MemoryStream(arquivoBytesZip))
+            //{
+            //    using (var arquivos = new ZipArchive(msZip, ZipArchiveMode.Read))
+            //    {
+            //        foreach (ZipArchiveEntry arquivoApk in arquivos.Entries)
+            //        {
+            //            filenameApk = arquivoApk.Name;
+            //            arquivoBytesApk = new byte[arquivoApk.Length];
+            //        }
+            //    }
+            //}
 
             // this will run for Android 33 and greater
             if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
@@ -90,9 +105,8 @@ namespace MauiAppVisit.ViewModel
             #endif
             }
 
-            using var stream = new MemoryStream(arquivoBytes);
-            var fileSaverResult = await FileSaver.Default.SaveAsync("test.apk", stream, new CancellationToken());
-            var a = fileSaverResult.IsSuccessful;
+            using var stream = new MemoryStream(arquivoBytesZip);
+            await FileSaver.Default.SaveAsync("teste.zip", stream, new CancellationToken());
             Loading = "false";
         }
     }
