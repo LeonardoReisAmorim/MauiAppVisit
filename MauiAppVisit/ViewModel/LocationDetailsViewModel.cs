@@ -11,6 +11,7 @@ using MauiAppVisit.Model;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Windows.Input;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MauiAppVisit.ViewModel
 {
@@ -69,7 +70,6 @@ namespace MauiAppVisit.ViewModel
         {
             Loading = "true";
             var arquivoBytesZip = Array.Empty<byte>();
-            var arquivoBytesApk = Array.Empty<byte>();
             var arquivoZip = new ArquivoDTO();
             var filenameApk = string.Empty;
             var baseUrl = HttpHelper.GetBaseUrl();
@@ -85,34 +85,34 @@ namespace MauiAppVisit.ViewModel
             }
             arquivoBytesZip = Convert.FromBase64String(arquivoZip.arquivo);
 
-            //using (MemoryStream msZip = new MemoryStream(arquivoBytesZip))
-            //{
-            //    using (var arquivos = new ZipArchive(msZip, ZipArchiveMode.Read))
-            //    {
-            //        foreach (ZipArchiveEntry arquivoApk in arquivos.Entries)
-            //        {
-            //            filenameApk = arquivoApk.Name;
-            //            arquivoBytesApk = new byte[arquivoApk.Length];
-            //        }
-            //    }
-            //}
-
-            // this will run for Android 33 and greater
-            if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
+            using (MemoryStream msZip = new MemoryStream(arquivoBytesZip))
             {
-            #if ANDROID
-                var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
-                if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
+                using (var arquivos = new ZipArchive(msZip, ZipArchiveMode.Read))
                 {
-                    ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
+                    foreach (ZipArchiveEntry arquivoApk in arquivos.Entries)
+                    {
+                        var streamAPK = arquivoApk.Open();
+                        filenameApk = arquivoApk.Name;
+
+                        // this will run for Android 33 and greater
+                        if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
+                        {
+                            #if ANDROID
+                                var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
+                                if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
+                                {
+                                    ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
+                                }
+                            #endif
+                        }
+
+                        await FileSaver.Default.SaveAsync(filenameApk, streamAPK, new CancellationToken());
+                    }
                 }
-            #endif
             }
 
-            using var stream = new MemoryStream(arquivoBytesZip);
-            await FileSaver.Default.SaveAsync("teste.zip", stream, new CancellationToken());
             Loading = "false";
-            Aviso = "Após feita instalação do ambiente virtual em formato .zip. Serão necessários alguns passos:\n1 - Abrir o arquivo .zip;\n2 - Extrair o arquivo .apk e colocar na pasta desejada;\n3 - Excluir o arquivo .zip;\n4 - Instalar o arquivo .apk;\n5 - Se divirta!";
+            Aviso = "Após feita instalação do ambiente virtual em formato .apk. Serão necessários alguns passos:\n1 - Instalar o arquivo .apk referente ao ambiente virtual\n2 - Se divirta!";
         }
     }
 }
