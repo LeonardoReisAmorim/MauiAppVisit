@@ -25,7 +25,7 @@ namespace MauiAppVisit.Helpers
             {
                 PropertyNameCaseInsensitive = true
             };
-            _httpClient.Timeout = TimeSpan.FromMinutes(5);
+            _httpClient.Timeout = TimeSpan.FromMinutes(15);
         }
 
         public string GetBaseUrl()

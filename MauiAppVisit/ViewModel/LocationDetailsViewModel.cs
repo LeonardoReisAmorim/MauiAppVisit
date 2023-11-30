@@ -80,14 +80,9 @@ namespace MauiAppVisit.ViewModel
 
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                arquivoZip = JsonSerializer.Deserialize<ArquivoDTO>(responseContent);
-            }
-            arquivoBytesZip = Convert.FromBase64String(arquivoZip.arquivo);
+                var responseContent = await response.Content.ReadAsStreamAsync();
 
-            using (MemoryStream msZip = new MemoryStream(arquivoBytesZip))
-            {
-                using (var arquivos = new ZipArchive(msZip, ZipArchiveMode.Read))
+                using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
                 {
                     foreach (ZipArchiveEntry arquivoApk in arquivos.Entries)
                     {
@@ -97,19 +92,47 @@ namespace MauiAppVisit.ViewModel
                         // this will run for Android 33 and greater
                         if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
                         {
-                            #if ANDROID
-                                var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
-                                if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
-                                {
-                                    ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
-                                }
-                            #endif
+#if ANDROID
+                            var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
+                            if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
+                            {
+                                ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
+                            }
+#endif
                         }
 
                         await FileSaver.Default.SaveAsync(filenameApk, streamAPK, new CancellationToken());
                     }
                 }
+
             }
+            //arquivoBytesZip = Convert.FromBase64String(arquivoZip.arquivo);
+
+            //using (MemoryStream msZip = new MemoryStream(arquivoBytesZip))
+            //{
+            //    using (var arquivos = new ZipArchive(msZip, ZipArchiveMode.Read))
+            //    {
+            //        foreach (ZipArchiveEntry arquivoApk in arquivos.Entries)
+            //        {
+            //            var streamAPK = arquivoApk.Open();
+            //            filenameApk = arquivoApk.Name;
+
+            //            // this will run for Android 33 and greater
+            //            if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
+            //            {
+            //                #if ANDROID
+            //                    var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
+            //                    if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
+            //                    {
+            //                        ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
+            //                    }
+            //                #endif
+            //            }
+
+            //            await FileSaver.Default.SaveAsync(filenameApk, streamAPK, new CancellationToken());
+            //        }
+            //    }
+            //}
 
             Loading = "false";
             Aviso = "Após feita instalação do ambiente virtual em formato .apk. Serão necessários alguns passos:\n1 - Instalar o arquivo .apk referente ao ambiente virtual\n2 - Se divirta!";
