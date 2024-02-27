@@ -16,37 +16,48 @@
             RowSpacing="40">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Label
-                Text="Escolha o lugar para visitar clicando na imagem"
-                FontSize="28"
-                HorizontalTextAlignment="Center"
-                Margin="0, 50, 0, 0"
+                Text="Bem vindo!"
+                TextColor="White"
+                FontSize="20"
+                HorizontalTextAlignment="Start"
+                Margin="20, 20, 0, 0"
                 Grid.Row="0"/>
+
+            <Label
+                Text="Qual lugar deseja visitar?"
+                FontSize="20"
+                TextColor="White"
+                HorizontalTextAlignment="Start"
+                Margin="20, 0, 0, 0"
+                Grid.Row="1"/>
 
             <CollectionView 
                 ItemsSource="{Binding Lugares}"
-                Grid.Row="1">
+                Grid.Row="2">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <VerticalStackLayout
-                            Margin="15">
-                            <Label 
-                                FontSize="Large"
-                                FontAttributes="Bold"
-                                Text="{Binding nome}"
-                                HorizontalOptions="Center"/>
-
+                            Margin="50, 0, 50, 50">
                             <ImageButton
                                 Source="{Binding ImagemByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                 Aspect="AspectFill"
-                                HeightRequest="300"
+                                MaximumHeightRequest="500"
                                 CommandParameter="{Binding id}"
                                 Clicked="ImageButton_Clicked"
-                                CornerRadius="10"/>
+                                CornerRadius="20"/>
+
+                            <Label
+                                FontSize="18"
+                                TextColor="White"
+                                Text="{Binding nome}"
+                                HorizontalOptions="Start"
+                                Margin="10,10,0,0"/>
                         </VerticalStackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

@@ -9,6 +9,7 @@ namespace MauiAppVisit
         {
             InitializeComponent();
             BindingContext = new LocalItensViewModel();
+            BackgroundColor = Color.FromRgb(26, 26, 26);
         }
 
         private void ImageButton_Clicked(object sender, EventArgs e)

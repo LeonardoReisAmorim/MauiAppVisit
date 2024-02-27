@@ -11,47 +11,77 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid
-        Padding="10">
-        
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="150"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <StackLayout>
+        <Border WidthRequest="300"
+                HeightRequest="400"
+                StrokeShape="RoundRectangle 50"
+                Margin="0,50,0,0">
 
-        <Label 
-            Text="{Binding DescriptionPlace}"
-            VerticalOptions="Start" 
-            HorizontalOptions="Start"
-            FontSize="15"
-            Grid.Row="0"
-            Margin="0, 15, 0, 0"/>
+            <Border.Shadow>
+                <Shadow Brush="White"
+                        Offset="10,10"
+                        Opacity=".5"/>
+            </Border.Shadow>
 
-        <Image
-            Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-            Aspect="AspectFill"
-            HeightRequest="300"
-            Grid.Row="1"/>
+            <Grid Padding="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Image
+                    Source="{Binding ImagePlaceByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                    Aspect="AspectFill"
+                    MaximumHeightRequest="150"
+                    Grid.Row="0"/>
+
+                <Label 
+                    Text="{Binding Nome}"
+                    VerticalOptions="Start" 
+                    HorizontalOptions="Start"
+                    FontAttributes="Bold"
+                    FontSize="17"
+                    Grid.Row="1"/>
+
+                <ScrollView
+                    Grid.Row="2"
+                    Margin="10,-20,5,0">
+                    <Label 
+                        Text="{Binding DescriptionPlace}"
+                        VerticalOptions="Start" 
+                        HorizontalOptions="Start"
+                        FontSize="15"
+                        
+                        />
+                </ScrollView>
+                
+            </Grid>
+        </Border>
 
         <Button
-            Text="VISITAR LOCAL"
-            HeightRequest="50"
-            WidthRequest="200"
-            CornerRadius="10"
-            BackgroundColor="#10B5BF"
+            Text="Iniciar"
+            FontSize="30"
+            FontAttributes="Bold"
+            BackgroundColor="#1a1a1a"
+            HeightRequest="70"
+            WidthRequest="350"
+            CornerRadius="50"
             TextColor="White"
-            Grid.Row="2"
-            Command="{Binding GetArquivoCommand}"/>
+            BorderWidth="1"
+            BorderColor="White"
+            Command="{Binding GetArquivoCommand}"
+            Margin="0,40,0,0"/>
 
         <ActivityIndicator IsRunning="{Binding Loading}" />
 
         <Label 
             Text="{Binding Aviso}"
+            TextColor="White"
             VerticalOptions="Start" 
             HorizontalOptions="Start"
-            FontSize="15"
-            Grid.Row="3"/>  
-    </Grid>
+            Margin="10"
+            FontSize="15"/> 
+    </StackLayout>
+    
 </ContentPage>

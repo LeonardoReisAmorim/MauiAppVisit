@@ -26,6 +26,9 @@ namespace MauiAppVisit.ViewModel
         private string _descriptionPlace;
 
         [ObservableProperty]
+        private string _nome;
+
+        [ObservableProperty]
         private string _loading;
 
         [ObservableProperty]
@@ -59,6 +62,7 @@ namespace MauiAppVisit.ViewModel
 
                     Idarquivo = data[0].arquivoId;
                     DescriptionPlace = data[0].descricao;
+                    Nome = data[0].nome;
                     ImagePlaceByte = Convert.FromBase64String(data[0].imagem);
                 }
             }
@@ -102,7 +106,7 @@ namespace MauiAppVisit.ViewModel
 
             }
             Loading = "false";
-            Aviso = "Após feita instalação do ambiente virtual em formato .apk. Serão necessários alguns passos:\n1 - Instalar o arquivo .apk referente ao ambiente virtual\n2 - Se divirta!";
+            Aviso = "Após feita instalação do ambiente virtual em formato .apk. Serão necessários alguns passos:\n1 - Instalar o arquivo .apk referente ao ambiente virtual no diretório baixado;\n2 - Se divirta!";
         }
     }
 }
