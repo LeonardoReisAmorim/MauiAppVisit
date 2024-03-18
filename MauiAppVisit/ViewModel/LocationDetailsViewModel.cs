@@ -11,7 +11,6 @@ using MauiAppVisit.Model;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Windows.Input;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MauiAppVisit.ViewModel
 {
