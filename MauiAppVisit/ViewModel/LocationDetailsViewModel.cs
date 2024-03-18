@@ -16,7 +16,7 @@ namespace MauiAppVisit.ViewModel
 {
     public partial class LocationDetailsViewModel : ObservableObject
     {
-        HttpHelper HttpHelper { get; set; }
+        private HttpHelper HttpHelper { get; set; }
 
         private readonly int IdLugar;
         private int Idarquivo;
