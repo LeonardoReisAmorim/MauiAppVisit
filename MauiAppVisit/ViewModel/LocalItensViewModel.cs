@@ -11,11 +11,19 @@ namespace MauiAppVisit.ViewModel
         HttpHelper HttpHelper { get; set; }
 
         [ObservableProperty]
-        public ObservableCollection<Lugar> _lugares; 
+        public ObservableCollection<Lugar> _lugares;
+
+        [ObservableProperty]
+        private string _loading;
+
+        [ObservableProperty]
+        private string _avisoErro;
 
         public LocalItensViewModel()
         {
             HttpHelper = new HttpHelper();
+            Loading = "true";
+            AvisoErro = "";
             CarregaLugaresAsync();
         }
 
@@ -25,21 +33,32 @@ namespace MauiAppVisit.ViewModel
             var htppClient = HttpHelper.GetHttpClient();
 
             var url = $"{baseUrl}/Lugar";
-            var response = await htppClient.GetAsync(url);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                using (var responseStream = await response.Content.ReadAsStreamAsync())
-                {
-                    var data = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream);
-                    Lugares = data;
+                var response = await htppClient.GetAsync(url);
 
-                    foreach (var item in Lugares)
+                if (response.IsSuccessStatusCode)
+                {
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
-                        item.ImagemByte = Convert.FromBase64String(item.imagem);
+                        var data = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream);
+                        Lugares = data;
+
+                        foreach (var item in Lugares)
+                        {
+                            item.ImagemByte = Convert.FromBase64String(item.imagem);
+                        }
                     }
+                    Loading = "false";
                 }
             }
+            catch (Exception ex)
+            {
+                Loading = "false";
+                AvisoErro = "Servidor indisponível, por favor tente novamente mais tarde!";
+            }
+            
         }
     }
 }

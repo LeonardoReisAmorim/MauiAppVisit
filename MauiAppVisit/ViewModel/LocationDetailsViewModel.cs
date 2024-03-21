@@ -40,7 +40,7 @@ namespace MauiAppVisit.ViewModel
         {
             IdLugar = Convert.ToInt32(Id);
             HttpHelper = new HttpHelper();
-            Loading = "false";
+            Loading = "true";
             Aviso = "";
             GetLocationDetailsById();
         }
@@ -51,19 +51,29 @@ namespace MauiAppVisit.ViewModel
             var htppClient = HttpHelper.GetHttpClient();
 
             var url = $"{baseUrl}/Lugar/{IdLugar}";
-            var response = await htppClient.GetAsync(url);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                using (var responseStream = await response.Content.ReadAsStreamAsync())
-                {
-                    var data = await JsonSerializer.DeserializeAsync<List<Lugar>>(responseStream);
+                var response = await htppClient.GetAsync(url);
 
-                    Idarquivo = data[0].arquivoId;
-                    DescriptionPlace = data[0].descricao;
-                    Nome = data[0].nome;
-                    ImagePlaceByte = Convert.FromBase64String(data[0].imagem);
+                if (response.IsSuccessStatusCode)
+                {
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        var data = await JsonSerializer.DeserializeAsync<List<Lugar>>(responseStream);
+
+                        Idarquivo = data[0].arquivoId;
+                        DescriptionPlace = data[0].descricao;
+                        Nome = data[0].nome;
+                        ImagePlaceByte = Convert.FromBase64String(data[0].imagem);
+                    }
+                    Loading = "false";
                 }
+            }
+            catch (Exception ex)
+            {
+                Loading = "false";
+                Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
         }
 
@@ -72,39 +82,49 @@ namespace MauiAppVisit.ViewModel
         private async Task GetArquivoAsync()
         {
             Loading = "true";
+            Aviso = "";
             var baseUrl = HttpHelper.GetBaseUrl();
             var htppClient = HttpHelper.GetHttpClient();
 
             var url = $"{baseUrl}/Arquivo/{Idarquivo}";
-            var response = await htppClient.GetAsync(url);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var responseContent = response.Content.ReadAsStream();
+                var response = await htppClient.GetAsync(url);
 
-                using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
+                if (response.IsSuccessStatusCode)
                 {
+                    var responseContent = response.Content.ReadAsStream();
 
-                    // this will run for Android 33 and greater
-                    if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
+                    using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
                     {
-                    #if ANDROID
-                        var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
-                        if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
+
+                        // this will run for Android 33 and greater
+                        if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
                         {
-                            ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
-                        }
+                        #if ANDROID
+                            var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
+                            if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
+                            {
+                                ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
+                            }
                         #endif
+                        }
+
+                        var arquivoApk = arquivos.Entries[0];
+                        var streamAPK = arquivoApk.Open();
+
+                        await FileSaver.Default.SaveAsync(arquivoApk.Name, streamAPK, new CancellationToken());
+
+                        Loading = "false";
+                        Aviso = $"Após feita instalação do ambiente virtual em formato .apk. Serão necessários alguns passos:\n1 - Instalar o arquivo {arquivoApk.Name} referente ao ambiente virtual no diretório baixado;\n2 - Se divirta!";
                     }
-
-                    var arquivoApk = arquivos.Entries[0];
-                    var streamAPK = arquivoApk.Open();
-
-                    await FileSaver.Default.SaveAsync(arquivoApk.Name, streamAPK, new CancellationToken());
-
-                    Loading = "false";
-                    Aviso = $"Após feita instalação do ambiente virtual em formato .apk. Serão necessários alguns passos:\n1 - Instalar o arquivo {arquivoApk.Name} referente ao ambiente virtual no diretório baixado;\n2 - Se divirta!";
                 }
+            }
+            catch (Exception ex)
+            {
+                Loading = "false";
+                Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
         }
     }
