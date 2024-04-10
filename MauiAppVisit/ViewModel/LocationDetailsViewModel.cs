@@ -36,6 +36,9 @@ namespace MauiAppVisit.ViewModel
         [ObservableProperty]
         private byte[] _imagePlaceByte;
 
+        [ObservableProperty]
+        private string _idLugarInfo;
+
         public LocationDetailsViewModel(string Id)
         {
             IdLugar = Convert.ToInt32(Id);
@@ -66,6 +69,7 @@ namespace MauiAppVisit.ViewModel
                         DescriptionPlace = data[0].descricao;
                         Nome = data[0].nome;
                         ImagePlaceByte = Convert.FromBase64String(data[0].imagem);
+                        IdLugarInfo = IdLugar.ToString();
                     }
                     Loading = "false";
                 }

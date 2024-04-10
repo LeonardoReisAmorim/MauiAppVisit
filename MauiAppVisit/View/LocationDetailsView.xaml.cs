@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Views;
 using MauiAppVisit.ViewModel;
 
 namespace MauiAppVisit.View;
@@ -9,5 +10,11 @@ public partial class LocationDetailsView : ContentPage
 		InitializeComponent();
         BindingContext = new LocationDetailsViewModel(id);
         BackgroundColor = Color.FromRgb(26, 26, 26);
+    }
+
+    void OnButtonClicked(object sender, EventArgs e)
+    {
+        var Button = (Button)sender;
+        this.ShowPopup(new PopupInfo(Button.CommandParameter.ToString()));
     }
 }
