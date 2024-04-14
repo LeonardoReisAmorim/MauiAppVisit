@@ -121,7 +121,7 @@ namespace MauiAppVisit.ViewModel
                         await FileSaver.Default.SaveAsync(arquivoApk.Name, streamAPK, new CancellationToken());
 
                         Loading = "false";
-                        Aviso = $"Após feita instalação do ambiente virtual em formato .apk. Serão necessários alguns passos:\n1 - Instalar o arquivo {arquivoApk.Name} referente ao ambiente virtual no diretório baixado;\n2 - Se divirta!";
+                        Aviso = $"1 - Faça o download do ambiente virtual em formato '.apk':\n2 - Instale o arquivo '{arquivoApk.Name}' referente ao ambiente virtual no diretório baixado;\n3 - Divirta-se!";
                     }
                 }
             }
