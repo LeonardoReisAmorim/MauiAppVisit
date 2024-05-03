@@ -1,13 +1,8 @@
-﻿#if ANDROID
-using Android;
-using Android.Content.PM;
-using AndroidX.Core.App;
-using AndroidX.Core.Content;
-#endif
-using CommunityToolkit.Maui.Storage;
+﻿using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
+using MauiAppVisit.Platforms.Android;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Windows.Input;
@@ -102,18 +97,7 @@ namespace MauiAppVisit.ViewModel
 
                     using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
                     {
-
-                        // this will run for Android 33 and greater
-                        if (DeviceInfo.Platform == DevicePlatform.Android && OperatingSystem.IsAndroidVersionAtLeast(33))
-                        {
-                        #if ANDROID
-                            var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
-                            if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted)
-                            {
-                                ActivityCompat.RequestPermissions(activity, new[] { Manifest.Permission.ReadExternalStorage }, 1);
-                            }
-                        #endif
-                        }
+                        AndroidUtils.GrantedPermission();
 
                         var arquivoApk = arquivos.Entries[0];
                         var streamAPK = arquivoApk.Open();
