@@ -43,22 +43,23 @@
             Grid.Row="2">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <VerticalStackLayout
-                        Margin="50, 0, 50, 50">
-                                <ImageButton
-                            Source="{Binding ImagemByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                            Aspect="AspectFill"
-                            MaximumHeightRequest="500"
-                            CommandParameter="{Binding id}"
-                            Clicked="ImageButton_Clicked"
-                            CornerRadius="20"/>
-
+                            <VerticalStackLayout Margin="50, 0, 50, 50">
+                                
                                 <Label
-                            FontSize="18"
-                            TextColor="White"
-                            Text="{Binding nome}"
-                            HorizontalOptions="Start"
-                            Margin="10,10,0,0"/>
+                                FontSize="18"
+                                TextColor="White"
+                                Text="{Binding nome}"
+                                HorizontalOptions="Start"
+                                Margin="10,10,0,0"/>
+
+                                <ImageButton
+                                Source="{Binding ImagemByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                Aspect="AspectFill"
+                                MaximumHeightRequest="500"
+                                CommandParameter="{Binding id}"
+                                Clicked="ImageButton_Clicked"
+                                CornerRadius="20"/>
+                                
                             </VerticalStackLayout>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

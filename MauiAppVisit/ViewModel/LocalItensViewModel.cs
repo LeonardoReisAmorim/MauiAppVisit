@@ -45,9 +45,16 @@ namespace MauiAppVisit.ViewModel
                         var data = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream);
                         Lugares = data;
 
-                        foreach (var item in Lugares)
+                        if (!Lugares.Any())
                         {
-                            item.ImagemByte = Convert.FromBase64String(item.imagem);
+                            AvisoErro = "No momento não temos ambientes virtuais disponiveis";
+                        }
+                        else
+                        {
+                            foreach (var item in Lugares)
+                            {
+                                item.ImagemByte = Convert.FromBase64String(item.imagem);
+                            }
                         }
                     }
                     Loading = "false";
