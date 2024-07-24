@@ -1,83 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="MauiAppVisit.MainPage"
              Title="V I S I T">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
-    <StackLayout>
-        <ScrollView>
-            <Grid
-        RowSpacing="40">
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Label
+    <VerticalStackLayout>
+        <Label
             Text="Bem vindo!"
             TextColor="White"
             FontSize="20"
-            HorizontalTextAlignment="Start"
-            Margin="20, 20, 0, 0"
-            Grid.Row="0"/>
+            HorizontalTextAlignment="Center"
+            VerticalTextAlignment="Center"
+            Margin="50, 50, 50, 100"/>
 
-                <Label
-            Text="Qual lugar deseja visitar?"
+        <Button
+            Text="Lugares"
             FontSize="20"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
             TextColor="White"
-            HorizontalTextAlignment="Start"
-            Margin="20, 0, 0, 0"
-            Grid.Row="1"/>
-
-                <CollectionView 
-            ItemsSource="{Binding Lugares}"
-            Grid.Row="2">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <VerticalStackLayout Margin="50, 0, 50, 50">
-                                
-                                <Label
-                                FontSize="18"
-                                TextColor="White"
-                                Text="{Binding nome}"
-                                HorizontalOptions="Start"
-                                Margin="10,10,0,0"/>
-
-                                <ImageButton
-                                Source="{Binding ImagemByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                Aspect="AspectFill"
-                                MaximumHeightRequest="500"
-                                CommandParameter="{Binding id}"
-                                Clicked="ImageButton_Clicked"
-                                CornerRadius="20"/>
-                                
-                            </VerticalStackLayout>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-
-            </Grid>
-        </ScrollView>
-
-        <ActivityIndicator IsRunning="{Binding Loading}" />
-
-        <Label 
-        Text="{Binding AvisoErro}"
-        TextColor="White"
-        VerticalOptions="Start" 
-        HorizontalOptions="Start"
-        Margin="10"
-        FontSize="15"/>
-        
-    </StackLayout>
+            Clicked="Button_Clicked"
+            Margin="0, 0, 0, 0"/>  
+    </VerticalStackLayout>
 
 </ContentPage>

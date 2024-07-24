@@ -63,6 +63,9 @@
 	  <MauiXaml Update="View\DetailsPlace.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\Locations.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\PopupInfo.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

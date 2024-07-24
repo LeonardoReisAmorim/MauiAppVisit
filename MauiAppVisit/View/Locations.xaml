@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="MauiAppVisit.View.Locations"
+             Title="V I S I T">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout>
+            <CollectionView ItemsSource="{Binding Lugares}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <VerticalStackLayout Margin="50, 50, 50, 50">
+
+                            <Label
+                            FontSize="18"
+                            TextColor="White"
+                            Text="{Binding nome}"
+                            HorizontalOptions="Start"
+                            Margin="10,10,0,0"/>
+
+                            <ImageButton
+                            Source="{Binding ImagemByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                            Aspect="AspectFill"
+                            MaximumHeightRequest="500"
+                            CommandParameter="{Binding id}"
+                            Clicked="ImageButton_Clicked"
+                            CornerRadius="20"/> 
+
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            
+            <ActivityIndicator IsRunning="{Binding Loading}" />
+
+            <Label 
+            Text="{Binding AvisoErro}"
+            TextColor="White"
+            VerticalOptions="Start" 
+            HorizontalOptions="Start"
+            Margin="10"
+            FontSize="15"/>
+        </StackLayout>
+    </ScrollView>
+    
+</ContentPage>
