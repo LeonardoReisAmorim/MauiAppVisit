@@ -8,7 +8,7 @@ public partial class Locations : ContentPage
 	{
 		InitializeComponent();
         BindingContext = new LocalItensViewModel();
-        BackgroundColor = Color.FromRgb(26, 26, 26);
+        BackgroundColor = Color.FromRgb(36, 87, 255);
     }
 
     private void ImageButton_Clicked(object sender, EventArgs e)

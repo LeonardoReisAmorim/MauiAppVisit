@@ -7,7 +7,7 @@
             InitializeComponent();
             MainPage = new NavigationPage(new MainPage())
             {
-                BarBackgroundColor = Color.FromHex("#3B86F6"),
+                BarBackgroundColor = Color.FromRgb(36, 87, 255),
                 BarTextColor = Color.FromRgb(255, 255, 255)
             };
         }

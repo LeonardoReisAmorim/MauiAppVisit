@@ -9,7 +9,7 @@ public partial class LocationDetailsView : ContentPage
 	{
 		InitializeComponent();
         BindingContext = new LocationDetailsViewModel(id);
-        BackgroundColor = Color.FromRgb(26, 26, 26);
+        BackgroundColor = Color.FromRgb(36, 87, 255);
     }
 
     void OnButtonClicked(object sender, EventArgs e)

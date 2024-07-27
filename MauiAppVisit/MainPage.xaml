@@ -4,23 +4,26 @@
              x:Class="MauiAppVisit.MainPage"
              Title="V I S I T">
 
-    <VerticalStackLayout>
+    <Grid>
+        <Image Source="backgroun_image.png"
+               Aspect="AspectFill" />
+
         <Label
             Text="Bem vindo!"
             TextColor="White"
             FontSize="20"
             HorizontalTextAlignment="Center"
-            VerticalTextAlignment="Center"
-            Margin="50, 50, 50, 100"/>
+            VerticalTextAlignment="Start"
+            Margin="0, 50, 0, 0"/>
 
         <Button
-            Text="Lugares"
+            Text="Comece sua aventura"
             FontSize="20"
-            VerticalOptions="Center"
+            VerticalOptions="End"
             HorizontalOptions="Center"
             TextColor="White"
             Clicked="Button_Clicked"
-            Margin="0, 0, 0, 0"/>  
-    </VerticalStackLayout>
+            Margin="0, 0, 0, 50"/>  
+    </Grid>
 
 </ContentPage>
