@@ -6,7 +6,7 @@ namespace MauiAppVisit.Helpers
     {
         readonly HttpClient _httpClient;
         readonly JsonSerializerOptions _serializerOptions;
-        readonly string baseUrl = "http://10.0.2.2:5241"; //5000 (docker)
+        readonly string baseUrl = "https://apivisitvr.azurewebsites.net/";
 
         public HttpHelper()
         {
