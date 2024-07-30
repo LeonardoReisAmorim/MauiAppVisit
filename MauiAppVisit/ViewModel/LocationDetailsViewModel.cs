@@ -89,7 +89,7 @@ namespace MauiAppVisit.ViewModel
 
             try
             {
-                var response = await htppClient.GetAsync(url);
+                var response = htppClient.GetAsync(url).Result;
 
                 if (response.IsSuccessStatusCode)
                 {

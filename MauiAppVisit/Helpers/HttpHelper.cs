@@ -6,16 +6,16 @@ namespace MauiAppVisit.Helpers
     {
         readonly HttpClient _httpClient;
         readonly JsonSerializerOptions _serializerOptions;
-        readonly string baseUrl = "https://apivisitvr.azurewebsites.net";
+        readonly string baseUrl = "http://10.0.2.2:5241";
 
         public HttpHelper()
         {
-            #if DEBUG
-                HttpsClientHandlerService handler = new HttpsClientHandlerService();
-                _httpClient = new HttpClient(handler.GetPlatformMessageHandler());
-            #else
+#if DEBUG
+            HttpsClientHandlerService handler = new HttpsClientHandlerService();
+            _httpClient = new HttpClient(handler.GetPlatformMessageHandler());
+#else
                 _httpClient = new HttpClient();
-            #endif
+#endif
             _serializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
