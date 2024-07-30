@@ -6,7 +6,7 @@ namespace MauiAppVisit.Helpers
     {
         readonly HttpClient _httpClient;
         readonly JsonSerializerOptions _serializerOptions;
-        readonly string baseUrl = "https://apivisitvr.azurewebsites.net/";
+        readonly string baseUrl = "https://apivisitvr.azurewebsites.net";
 
         public HttpHelper()
         {
