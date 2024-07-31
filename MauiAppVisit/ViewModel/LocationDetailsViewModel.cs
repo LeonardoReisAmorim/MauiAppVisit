@@ -83,18 +83,17 @@ namespace MauiAppVisit.ViewModel
             Loading = "true";
             Aviso = "";
             var baseUrl = HttpHelper.GetBaseUrl();
-            var htppClient = HttpHelper.GetHttpClient();
+            var httpClient = HttpHelper.GetHttpClient();
 
             var url = $"{baseUrl}/Arquivo/{Idarquivo}";
 
             try
             {
-                var response = htppClient.GetAsync(url).Result;
+                var response = await httpClient.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseContent = response.Content.ReadAsStream();
-
+                    var responseContent = await response.Content.ReadAsStreamAsync();
                     using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
                     {
                         AndroidUtils.GrantedPermission();
