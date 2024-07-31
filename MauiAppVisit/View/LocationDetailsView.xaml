@@ -15,7 +15,8 @@
         <Border WidthRequest="350"
                 HeightRequest="500"
                 StrokeShape="RoundRectangle 50"
-                Margin="0,0,0,0">
+                Margin="0,0,0,0"
+                BackgroundColor="White">
 
             <Border.Shadow>
                 <Shadow Brush="White"
@@ -41,6 +42,7 @@
                     HorizontalOptions="Start"
                     FontAttributes="Bold"
                     FontSize="17"
+                    TextColor="Black"
                     Grid.Row="1"/>
 
                 <ScrollView
@@ -51,6 +53,7 @@
                         VerticalOptions="Start" 
                         HorizontalOptions="Start"
                         FontSize="15"
+                        TextColor="Black"
                         
                         />
                 </ScrollView>
@@ -65,7 +68,7 @@
             HeightRequest="70"
             WidthRequest="350"
             CornerRadius="50"
-            TextColor="White"
+            TextColor="Black"
             BorderWidth="1"
             BorderColor="White"
             Command="{Binding GetArquivoCommand}"
@@ -78,7 +81,7 @@
                 HeightRequest="50"
                 WidthRequest="150"
                 CornerRadius="50"
-                TextColor="White"
+                TextColor="Black"
                 BorderWidth="1"
                 BorderColor="White"
                 CommandParameter="{Binding IdLugarInfo}"
