@@ -22,6 +22,7 @@
             VerticalOptions="End"
             HorizontalOptions="Center"
             TextColor="Black"
+            BackgroundColor="White"
             Clicked="Button_Clicked"
             Margin="0, 0, 0, 50"/>  
     </Grid>
