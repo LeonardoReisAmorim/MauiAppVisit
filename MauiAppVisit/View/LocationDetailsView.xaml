@@ -71,6 +71,7 @@
             TextColor="Black"
             BorderWidth="1"
             BorderColor="White"
+            BackgroundColor="White"
             Command="{Binding GetArquivoCommand}"
             Margin="0,40,0,0"/>
 
@@ -84,6 +85,7 @@
                 TextColor="Black"
                 BorderWidth="1"
                 BorderColor="White"
+                BackgroundColor="White"
                 CommandParameter="{Binding IdLugarInfo}"
                 HorizontalOptions="End"
                 Margin="0,10,0,0"/>
