@@ -31,12 +31,18 @@ namespace MauiAppVisit.ViewModel
         {
             var baseUrl = HttpHelper.GetBaseUrl();
             var htppClient = HttpHelper.GetHttpClient();
-
+            
             var url = $"{baseUrl}/Lugar";
 
             try
             {
                 var response = await htppClient.GetAsync(url);
+
+                if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Loading = "false";
+                    AvisoErro = "Usuario nao autorizado!";
+                }
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiAppVisit.View.Login"
+             Title="Login">
+    
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *"
+      RowSpacing="20"
+      Margin="20,150,20,40">
+
+        <Image Grid.Row="0"
+           Source="vr_logo.png"
+           Aspect="AspectFit"
+           WidthRequest="100"
+           HeightRequest="100" />
+
+        <Label Grid.Row="1"
+           Text="Realize o login para entrar nos mundos virtuais"
+           FontAttributes="Bold"
+           HorizontalOptions="Center"
+           TextColor="White"/>
+
+        <Frame Grid.Row="2"
+           Padding="15"
+           BackgroundColor="White">
+
+            <VerticalStackLayout>
+                <Entry Placeholder="Email"
+                   Text="{Binding Email}"/>
+                <Entry Placeholder="Senha"
+                   IsPassword="True"
+                   Text="{Binding Password}"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Button Grid.Row="3"
+            Text="Login"
+            FontSize="Medium"
+            BackgroundColor="Red"
+            Command="{Binding LoginCommand}"/>
+
+        <ActivityIndicator Grid.Row="4" IsRunning="{Binding Loading}" Color="White" />
+
+        <HorizontalStackLayout Grid.Row="5"
+                           Spacing="2" HorizontalOptions="Center"
+                           VerticalOptions="EndAndExpand">
+
+            <Label Text="Não possui conta ?" TextColor="white"/>
+            <Label Text="Registre aqui" TextColor="Red" FontAttributes="Bold">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer x:Name="TapRegister" Tapped="TapRegister_Tapped"></TapGestureRecognizer>
+                </Label.GestureRecognizers>
+            </Label>
+
+
+        </HorizontalStackLayout>
+
+    </Grid>
+    
+</ContentPage>
