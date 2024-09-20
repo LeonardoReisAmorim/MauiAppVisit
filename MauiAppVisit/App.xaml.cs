@@ -7,19 +7,27 @@ namespace MauiAppVisit
         public App()
         {
             InitializeComponent();
-            MainPage = new AppShell();
-            RedirectUserBasedOnToken();
+            MainPage = new PaginaInicial();
         }
 
-        private async void RedirectUserBasedOnToken()
+        protected override async void OnStart()
+        {
+            base.OnStart();
+            await RedirectUserBasedOnToken();
+        }
+
+        private async Task RedirectUserBasedOnToken()
         {
             if (!await AuthorizationHelper.HasToken())
             {
+                MainPage = new AppShell();
                 await Shell.Current.GoToAsync("//Login");
-                return;
             }
-            
-            await Shell.Current.GoToAsync("//Locations");
+            else
+            {
+                MainPage = new AppShell();
+                await Shell.Current.GoToAsync("//Locations");
+            }
         }
     }
 }

@@ -9,7 +9,7 @@
       Margin="20,150,20,40">
 
         <Image Grid.Row="0"
-           Source="vr_logo.png"
+           Source="imagempaginainicial.jpg"
            Aspect="AspectFit"
            WidthRequest="100"
            HeightRequest="100" />
