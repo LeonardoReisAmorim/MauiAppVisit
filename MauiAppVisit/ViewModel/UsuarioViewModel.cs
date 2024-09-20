@@ -25,9 +25,6 @@ namespace MauiAppVisit.ViewModel
         [ObservableProperty]
         private string _loading;
 
-        //[ObservableProperty]
-        //private string _token;
-
         public UsuarioViewModel()
         {
             HttpHelper = new HttpHelper();
@@ -42,7 +39,7 @@ namespace MauiAppVisit.ViewModel
             Loading = "true";
 
             var baseUrl = HttpHelper.GetBaseUrl();
-            var httpClient = HttpHelper.GetHttpClient();
+            var httpClient = await HttpHelper.GetHttpClient();
 
             var url = $"{baseUrl}/Usuario/register";
             var usuario = new Usuario(Nome, Email, Password);
@@ -64,15 +61,14 @@ namespace MauiAppVisit.ViewModel
                     var contentResponse = await response.Content.ReadAsStringAsync();
                     var userToken = JsonSerializer.Deserialize<UserToken>(contentResponse);
 
-                    Preferences.Set("token", userToken.token);
-                    Preferences.Set("usuarioid", userToken.usuarioId);
+                    await AuthorizationHelper.SetDataUser(userToken.token, userToken.usuarioId);
 
                     Loading = "false";
 
                     await Shell.Current.GoToAsync("//Locations");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Loading = "false";
                 await Shell.Current.DisplayAlert("teste", "Ocorreu um erro, por favor tente novamente mais tarde!", "OK");
@@ -84,7 +80,7 @@ namespace MauiAppVisit.ViewModel
             Loading = "true";
 
             var baseUrl = HttpHelper.GetBaseUrl();
-            var httpClient = HttpHelper.GetHttpClient();
+            var httpClient = await HttpHelper.GetHttpClient();
 
             var url = $"{baseUrl}/Usuario/login";
             var usuario = new Usuario(null, Email, Password);
@@ -106,15 +102,14 @@ namespace MauiAppVisit.ViewModel
                     var contentResponse = await response.Content.ReadAsStringAsync();
                     var userToken = JsonSerializer.Deserialize<UserToken>(contentResponse);
 
-                    Preferences.Set("token", userToken.token);
-                    Preferences.Set("usuarioid", userToken.usuarioId);
+                    await AuthorizationHelper.SetDataUser(userToken.token, userToken.usuarioId);
 
                     Loading = "false";
 
                     await Shell.Current.GoToAsync("//Locations", true);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Loading = "false";
                 await Shell.Current.DisplayAlert("Erro", "Ocorreu um erro, por favor tente novamente mais tarde!", "OK");

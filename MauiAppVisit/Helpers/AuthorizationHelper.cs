@@ -4,9 +4,9 @@ namespace MauiAppVisit.Helpers
 {
     public static class AuthorizationHelper
     {
-        public static bool HasToken()
+        public async static Task<bool> HasToken()
         {
-            var token = Preferences.Get("token", string.Empty);
+            var token = await GetToken();
             return !string.IsNullOrWhiteSpace(token) && IsTokenValid(token);
         }
 
@@ -34,6 +34,22 @@ namespace MauiAppVisit.Helpers
             }
 
             return false;
+        }
+
+        public async static Task<string> GetToken()
+        {
+            return await SecureStorage.GetAsync("token");
+        }
+
+        public static string GetUserId()
+        {
+            return Preferences.Get("usuarioId", string.Empty);
+        }
+
+        public async static Task SetDataUser(string token, int usuarioId)
+        {
+            await SecureStorage.SetAsync("token", token);
+            Preferences.Set("usuarioId", usuarioId);
         }
     }
 }

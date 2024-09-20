@@ -4,11 +4,19 @@ namespace MauiAppVisit.View;
 
 public partial class Locations : ContentPage
 {
-	public Locations()
+    private readonly LocalItensViewModel _localItensViewModel;
+    public Locations()
 	{
 		InitializeComponent();
-        BindingContext = new LocalItensViewModel();
+        _localItensViewModel = new LocalItensViewModel();
+        BindingContext = _localItensViewModel;
         BackgroundColor = Color.FromRgb(36, 87, 255);
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _localItensViewModel.CarregaLugaresAsync();
     }
 
     private void ImageButton_Clicked(object sender, EventArgs e)

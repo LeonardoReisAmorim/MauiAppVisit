@@ -16,13 +16,12 @@ namespace MauiAppVisit.ViewModel
         {
             IdLugar = Convert.ToInt32(Id);
             HttpHelper = new HttpHelper();
-            GetInformationPlaceVRByIdPlace();
         }
 
-        private async void GetInformationPlaceVRByIdPlace()
+        public async Task GetInformationPlaceVRByIdPlace()
         {
             var baseUrl = HttpHelper.GetBaseUrl();
-            var htppClient = HttpHelper.GetHttpClient();
+            var htppClient = await HttpHelper.GetHttpClient();
 
             var url = $"{baseUrl}/Lugar/utilizationPlaceVR/{IdLugar}";
 
@@ -35,8 +34,9 @@ namespace MauiAppVisit.ViewModel
                     UtilizationPlaceVR = response.Content.ReadAsStringAsync().Result;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                throw;
                 //Loading = "false";
                 //Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }

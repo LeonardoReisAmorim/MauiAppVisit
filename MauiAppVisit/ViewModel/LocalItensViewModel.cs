@@ -24,13 +24,12 @@ namespace MauiAppVisit.ViewModel
             HttpHelper = new HttpHelper();
             Loading = "true";
             AvisoErro = "";
-            CarregaLugaresAsync();
         }
 
-        private async void CarregaLugaresAsync()
+        public async Task CarregaLugaresAsync()
         {
             var baseUrl = HttpHelper.GetBaseUrl();
-            var htppClient = HttpHelper.GetHttpClient();
+            var htppClient = await HttpHelper.GetHttpClient();
             
             var url = $"{baseUrl}/Lugar";
 
@@ -66,7 +65,7 @@ namespace MauiAppVisit.ViewModel
                     Loading = "false";
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Loading = "false";
                 AvisoErro = "Servidor indisponível, por favor tente novamente mais tarde!";

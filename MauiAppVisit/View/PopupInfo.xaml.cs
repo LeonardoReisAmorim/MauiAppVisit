@@ -5,9 +5,12 @@ namespace MauiAppVisit.View;
 
 public partial class PopupInfo : Popup
 {
-	public PopupInfo(string id)
+    private readonly InformationPlaceVR _informationPlaceVR;
+    public PopupInfo(string id)
 	{
 		InitializeComponent();
-        BindingContext = new InformationPlaceVR(id);
+        _informationPlaceVR = new InformationPlaceVR(id);
+        BindingContext = _informationPlaceVR;
+        Task.Run(async () => await _informationPlaceVR.GetInformationPlaceVRByIdPlace());
     }
 }

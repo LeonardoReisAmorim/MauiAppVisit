@@ -13,7 +13,7 @@ namespace MauiAppVisit
 
         private async void RedirectUserBasedOnToken()
         {
-            if (!AuthorizationHelper.HasToken())
+            if (!await AuthorizationHelper.HasToken())
             {
                 await Shell.Current.GoToAsync("//Login");
                 return;

@@ -7,12 +7,14 @@ namespace MauiAppVisit.Helpers
     public class HttpHelper
     {
         readonly HttpClient _httpClient;
-        readonly string baseUrl = "https://16ab-2804-2fb0-717-e800-5de9-dae1-ad74-67e3.ngrok-free.app"; //http://10.0.2.2:5241 https://apivisitvr.azurewebsites.net
+        readonly string baseUrl = "https://aff1-2804-2fb0-717-e800-dca9-2407-a2f0-3467.ngrok-free.app"; //http://10.0.2.2:5241 https://apivisitvr.azurewebsites.net
 
         public HttpHelper()
         {
-            _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromMinutes(5);
+            _httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromMinutes(5)
+            };
         }
 
         public string GetBaseUrl()
@@ -20,9 +22,9 @@ namespace MauiAppVisit.Helpers
             return baseUrl;
         }
 
-        public HttpClient GetHttpClient()
+        public async Task<HttpClient> GetHttpClient()
         {
-            AddAuthorizationHeader();
+            await AddAuthorizationHeader();
 
             return _httpClient;
         }
@@ -32,9 +34,9 @@ namespace MauiAppVisit.Helpers
             return new StringContent(JsonSerializer.Serialize(obj), Encoding.UTF8, "application/json");
         }
 
-        private void AddAuthorizationHeader()
+        private async Task AddAuthorizationHeader()
         {
-            var token = Preferences.Get("token", string.Empty);
+            var token = await AuthorizationHelper.GetToken();
 
             if (!string.IsNullOrWhiteSpace(token) && AuthorizationHelper.IsTokenValid(token))
             {
