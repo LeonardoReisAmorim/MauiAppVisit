@@ -23,7 +23,7 @@ namespace MauiAppVisit.ViewModel
             var baseUrl = HttpHelper.GetBaseUrl();
             var htppClient = await HttpHelper.GetHttpClient();
 
-            var url = $"{baseUrl}/Lugar/utilizationPlaceVR/{IdLugar}";
+            var url = $"{baseUrl}/Place/utilizationPlaceVR/{IdLugar}";
 
             try
             {

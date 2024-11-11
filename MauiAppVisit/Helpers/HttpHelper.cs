@@ -7,7 +7,7 @@ namespace MauiAppVisit.Helpers
     public class HttpHelper
     {
         readonly HttpClient _httpClient;
-        readonly string baseUrl = "https://7583-2804-2fb0-717-e800-4880-d3a8-5c75-62a5.ngrok-free.app"; //http://10.0.2.2:5241 https://apivisitvr.azurewebsites.net
+        readonly string baseUrl = "https://233a-2804-2fb0-717-e800-7d25-3ada-3a41-c9bc.ngrok-free.app"; //http://10.0.2.2:5241 https://apivisitvr.azurewebsites.net
 
         public HttpHelper()
         {
