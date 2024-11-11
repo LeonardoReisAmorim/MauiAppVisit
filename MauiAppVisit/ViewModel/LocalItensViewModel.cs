@@ -58,7 +58,7 @@ namespace MauiAppVisit.ViewModel
                         {
                             foreach (var item in Lugares)
                             {
-                                item.ImagemByte = Convert.FromBase64String(item.imagem);
+                                item.ImagemByte = Convert.FromBase64String(item.image);
                             }
                         }
                     }
