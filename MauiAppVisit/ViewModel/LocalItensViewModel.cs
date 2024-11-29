@@ -31,7 +31,7 @@ namespace MauiAppVisit.ViewModel
             var baseUrl = HttpHelper.GetBaseUrl();
             var htppClient = await HttpHelper.GetHttpClient();
             
-            var url = $"{baseUrl}/Lugar";
+            var url = $"{baseUrl}/Place";
 
             try
             {
@@ -58,7 +58,7 @@ namespace MauiAppVisit.ViewModel
                         {
                             foreach (var item in Lugares)
                             {
-                                item.ImagemByte = Convert.FromBase64String(item.imagem);
+                                item.ImagemByte = Convert.FromBase64String(item.image);
                             }
                         }
                     }

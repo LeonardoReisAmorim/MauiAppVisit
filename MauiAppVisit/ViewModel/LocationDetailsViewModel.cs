@@ -47,7 +47,7 @@ namespace MauiAppVisit.ViewModel
             var baseUrl = HttpHelper.GetBaseUrl();
             var htppClient = await HttpHelper.GetHttpClient();
 
-            var url = $"{baseUrl}/Lugar/{IdLugar}";
+            var url = $"{baseUrl}/Place/{IdLugar}";
 
             try
             {
@@ -59,10 +59,10 @@ namespace MauiAppVisit.ViewModel
                     {
                         var data = await JsonSerializer.DeserializeAsync<List<Lugar>>(responseStream);
 
-                        Idarquivo = data[0].arquivoId;
-                        DescriptionPlace = data[0].descricao;
-                        Nome = data[0].nome;
-                        ImagePlaceByte = Convert.FromBase64String(data[0].imagem);
+                        Idarquivo = data[0].fileVRId;
+                        DescriptionPlace = data[0].description;
+                        Nome = data[0].name;
+                        ImagePlaceByte = Convert.FromBase64String(data[0].image);
                         IdLugarInfo = IdLugar.ToString();
                     }
                     Loading = "false";
@@ -84,7 +84,7 @@ namespace MauiAppVisit.ViewModel
             var baseUrl = HttpHelper.GetBaseUrl();
             var httpClient = await HttpHelper.GetHttpClient();
 
-            var url = $"{baseUrl}/Arquivo/{Idarquivo}";
+            var url = $"{baseUrl}/FileVR/{Idarquivo}";
 
             try
             {

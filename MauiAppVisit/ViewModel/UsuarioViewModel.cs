@@ -41,7 +41,7 @@ namespace MauiAppVisit.ViewModel
             var baseUrl = HttpHelper.GetBaseUrl();
             var httpClient = await HttpHelper.GetHttpClient();
 
-            var url = $"{baseUrl}/Usuario/register";
+            var url = $"{baseUrl}/User/register";
             var usuario = new Usuario(Nome, Email, Password);
             
             try
@@ -82,7 +82,7 @@ namespace MauiAppVisit.ViewModel
             var baseUrl = HttpHelper.GetBaseUrl();
             var httpClient = await HttpHelper.GetHttpClient();
 
-            var url = $"{baseUrl}/Usuario/login";
+            var url = $"{baseUrl}/User/login";
             var usuario = new Usuario(null, Email, Password);
 
             try
