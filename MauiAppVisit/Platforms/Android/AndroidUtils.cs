@@ -3,11 +3,9 @@ using Android;
 using Android.Content.PM;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
-using Android.OS;
 using Android.Content;
-using Android.Provider;
-using System.IO;
-using Environment = Android.OS.Environment;
+using Application = Android.App.Application;
+using FileProvider = AndroidX.Core.Content.FileProvider;
 #endif
 
 namespace MauiAppVisit.Platforms.Android
@@ -29,52 +27,25 @@ namespace MauiAppVisit.Platforms.Android
             }
         }
 
-        public static void ListFilesInDownloadFolder()
+        public static async Task SaveApkFromStreamAsync(Stream stream)
         {
-            var activity = Platform.CurrentActivity ?? throw new NullReferenceException("Current activity is null");
+            var filePath = Path.Combine(Application.Context.CacheDir.Path, "update.apk");
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
-            {
-                if (!Environment.IsExternalStorageManager)
-                {
-                    Intent intent = new Intent(Settings.ActionManageAllFilesAccessPermission);
-                    activity.StartActivity(intent);
-                }
-            }
-            else
-            {
-                if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted ||
-                ContextCompat.CheckSelfPermission(activity, Manifest.Permission.WriteExternalStorage) != Permission.Granted)
-                {
-                    ActivityCompat.RequestPermissions(activity, new string[] {
-                    Manifest.Permission.ReadExternalStorage,
-                    Manifest.Permission.WriteExternalStorage
-                }, 1);
-                }
-            }
-            
-            //if (ContextCompat.CheckSelfPermission(activity, Manifest.Permission.ReadExternalStorage) != Permission.Granted ||
-            //ContextCompat.CheckSelfPermission(activity, Manifest.Permission.WriteExternalStorage) != Permission.Granted)
-            //{
-            //    ActivityCompat.RequestPermissions(activity, new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.WriteExternalStorage }, 1);
-            //}
+            await using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+            await stream.CopyToAsync(fileStream);
 
-            //var docsDirectory = Application.Context.GetExternalFilesDir(Environment.DirectoryDcim);
+            InstallApk(filePath);
+        }
 
-            var downloadsPath = Platform.CurrentActivity.Application.GetExternalFilesDir(Environment.DirectoryDownloads).AbsoluteFile.Path;
-            var apkFile = Path.Combine(downloadsPath, "Profile.pdf");
-            var a = File.OpenRead(apkFile);
-            //var files = Directory.GetFiles(downloadsPath); 
-            //foreach (var file in files) 
-            //{ 
+        private static void InstallApk(string filePath)
+        {
+            var file = new Java.IO.File(filePath);
+            var fileUri = FileProvider.GetUriForFile(Application.Context, $"{Application.Context.ApplicationContext.PackageName}.fileprovider", file);
 
-            //}
-
-            //List<string> filePaths = new List<string>();
-            //using (var collection = MediaStore.Downloads.ExternalContentUri)
-            //{
-
-            //}
+            var intent = new Intent(Intent.ActionView);
+            intent.SetDataAndType(fileUri, "application/vnd.android.package-archive");
+            intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
+            Application.Context.StartActivity(intent);
         }
     }
 }
