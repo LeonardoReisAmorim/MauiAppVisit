@@ -6,7 +6,6 @@ using AndroidX.Core.Content;
 using Android.Content;
 using Application = Android.App.Application;
 using FileProvider = AndroidX.Core.Content.FileProvider;
-using Android.OS;
 #endif
 
 namespace MauiAppVisit.Platforms.Android
@@ -51,24 +50,9 @@ namespace MauiAppVisit.Platforms.Android
 
         public static bool VerifyAppInstaledButton(string filename)
         {
-            var filePath = Path.Combine(Application.Context.GetExternalFilesDir(null).AbsolutePath, filename);
-            var packageManager = Application.Context.PackageManager;
-
-            try
-            {
-                var packageInfo = packageManager.GetPackageArchiveInfo(filePath, PackageInfoFlags.MetaData);
-                //var p = packageManager.GetPackageInfo(packageInfo?.PackageName, PackageInfoFlags.MetaData);
-
-                return true;
-            }
-            catch (ActivityNotFoundException)
-            {
-                return false;
-            }
-            catch (NullReferenceException)
-            {
-                return false;
-            }
+            var pm = Application.Context.PackageManager;
+            var packages = pm.GetInstalledApplications(PackageInfoFlags.MetaData);
+            return packages.Any(p => p.LoadLabel(pm).ToString().Equals(filename, StringComparison.OrdinalIgnoreCase));
         }
 
         public static async Task VerifyAppDownload(Stream stream, string filename)

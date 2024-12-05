@@ -67,8 +67,7 @@ namespace MauiAppVisit.ViewModel
                         Nome = data[0].name;
                         ImagePlaceByte = Convert.FromBase64String(data[0].image);
                         IdLugarInfo = IdLugar.ToString();
-
-                        var a = AndroidUtils.VerifyAppInstaledButton($"{data[0].fileName}.apk");
+                        NameButton = AndroidUtils.VerifyAppInstaledButton(data[0].fileName) ? "INICIAR" : "BAIXAR";
                     }
                     Loading = "false";
                 }
@@ -132,7 +131,7 @@ namespace MauiAppVisit.ViewModel
                     }
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
