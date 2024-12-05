@@ -62,7 +62,7 @@
         </Border>
 
         <Button
-            Text="Iniciar"
+            Text="{Binding NameButton}"
             FontSize="30"
             FontAttributes="Bold"
             HeightRequest="70"

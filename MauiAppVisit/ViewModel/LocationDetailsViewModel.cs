@@ -20,6 +20,9 @@ namespace MauiAppVisit.ViewModel
         private string _descriptionPlace;
 
         [ObservableProperty]
+        private string _nameButton;
+
+        [ObservableProperty]
         private string _nome;
 
         [ObservableProperty]
@@ -64,6 +67,8 @@ namespace MauiAppVisit.ViewModel
                         Nome = data[0].name;
                         ImagePlaceByte = Convert.FromBase64String(data[0].image);
                         IdLugarInfo = IdLugar.ToString();
+
+                        var a = AndroidUtils.VerifyAppInstaledButton($"{data[0].fileName}.apk");
                     }
                     Loading = "false";
                 }
@@ -83,32 +88,51 @@ namespace MauiAppVisit.ViewModel
             Aviso = "";
             var baseUrl = HttpHelper.GetBaseUrl();
             var httpClient = await HttpHelper.GetHttpClient();
-
-            var url = $"{baseUrl}/FileVR/{Idarquivo}";
+            bool hasInstalled = true;
 
             try
             {
-                var response = await httpClient.GetAsync(url);
+                var url = $"{baseUrl}/FileVR/dadosArquivos/{Idarquivo}";
+                var responseDetailsFileVR = await httpClient.GetAsync(url);
 
-                if (response.IsSuccessStatusCode)
+                if (responseDetailsFileVR.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStreamAsync();
-                    using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
+                    var responseContentFileVrDetailsStream = await responseDetailsFileVR.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<List<FileVrDetails>>(responseContentFileVrDetailsStream);
+
+                    hasInstalled = AndroidUtils.VerifyAppInstaled($"{data[0].fileName}.apk");
+
+                    if (hasInstalled)
                     {
-                        AndroidUtils.GrantedPermission();
-
-                        var arquivoApk = arquivos.Entries[0];
-                        var streamAPK = arquivoApk.Open();
-
                         Loading = "false";
+                        return;
+                    }
+                    
+                }
 
-                        await AndroidUtils.SaveApkFromStreamAsync(streamAPK);
+                if (!hasInstalled)
+                {
+                    url = $"{baseUrl}/FileVR/{Idarquivo}";
+                    var responseFile = await httpClient.GetAsync(url);
 
-                        //Aviso = $"1 - Faça o download do ambiente virtual em formato '.apk':\n2 - Instale o arquivo '{arquivoApk.Name}' referente ao ambiente virtual no diretório baixado;\n3 - Divirta-se!";
+                    if (responseFile.IsSuccessStatusCode)
+                    {
+                        var responseContent = await responseFile.Content.ReadAsStreamAsync();
+                        using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
+                        {
+                            AndroidUtils.GrantedPermission();
+
+                            var arquivoApk = arquivos.Entries[0];
+                            var streamAPK = arquivoApk.Open();
+
+                            Loading = "false";
+
+                            await AndroidUtils.VerifyAppDownload(streamAPK, arquivoApk.Name);
+                        }
                     }
                 }
             }
-            catch (Exception)
+            catch(Exception e)
             {
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";

@@ -8,5 +8,6 @@
         public int fileVRId { get; set; }
         public string image { get; set; }
         public byte[] ImagemByte { get; set; }
+        public string fileName { get; set; }
     }
 }
