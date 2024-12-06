@@ -4,6 +4,7 @@ using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
 using MauiAppVisit.Platforms.Android;
 using System.IO.Compression;
+using System.Net.Http;
 using System.Text.Json;
 using System.Windows.Input;
 
@@ -67,7 +68,7 @@ namespace MauiAppVisit.ViewModel
                         Nome = data[0].name;
                         ImagePlaceByte = Convert.FromBase64String(data[0].image);
                         IdLugarInfo = IdLugar.ToString();
-                        NameButton = AndroidUtils.VerifyAppInstaledButton(data[0].fileName) ? "INICIAR" : "BAIXAR";
+                        NameButton = AndroidUtils.HasAppInstalledButton(data[0].fileName) ? "INICIAR" : "BAIXAR";
                     }
                     Loading = "false";
                 }
@@ -87,46 +88,43 @@ namespace MauiAppVisit.ViewModel
             Aviso = "";
             var baseUrl = HttpHelper.GetBaseUrl();
             var httpClient = await HttpHelper.GetHttpClient();
-            bool hasInstalled = true;
+            AndroidUtils.CreateFileJsonFileVRVersion();
 
             try
             {
-                var url = $"{baseUrl}/FileVR/dadosArquivos/{Idarquivo}";
-                var responseDetailsFileVR = await httpClient.GetAsync(url);
+                FileVrDetails fileVrDetails = await RequestFileVrDetails(baseUrl, httpClient);
 
-                if (responseDetailsFileVR.IsSuccessStatusCode)
+                bool needUpdateAPK = AndroidUtils.NeedUpdateAPK(fileVrDetails);
+
+                if (needUpdateAPK)
                 {
-                    var responseContentFileVrDetailsStream = await responseDetailsFileVR.Content.ReadAsStringAsync();
-                    var data = JsonSerializer.Deserialize<List<FileVrDetails>>(responseContentFileVrDetailsStream);
-
-                    hasInstalled = AndroidUtils.VerifyAppInstaled($"{data[0].fileName}.apk");
+                    AndroidUtils.DeleteAppInDevice($"{fileVrDetails.fileName}.apk");
+                    await RequestDownloadFileVR(baseUrl, httpClient);
+                }
+                else
+                {
+                    bool hasInstalled = AndroidUtils.VerifyAppInstaled($"{fileVrDetails.fileName}.apk");
 
                     if (hasInstalled)
                     {
                         Loading = "false";
                         return;
                     }
-                    
-                }
 
-                if (!hasInstalled)
-                {
-                    url = $"{baseUrl}/FileVR/{Idarquivo}";
-                    var responseFile = await httpClient.GetAsync(url);
-
-                    if (responseFile.IsSuccessStatusCode)
+                    if (!hasInstalled)
                     {
-                        var responseContent = await responseFile.Content.ReadAsStreamAsync();
-                        using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
-                        {
-                            AndroidUtils.GrantedPermission();
+                        bool hasAppInDevice = AndroidUtils.HasAppInDevice($"{fileVrDetails.fileName}.apk");
 
-                            var arquivoApk = arquivos.Entries[0];
-                            var streamAPK = arquivoApk.Open();
+                        if (hasAppInDevice)
+                        {
+                            AndroidUtils.InstallApk($"{fileVrDetails.fileName}.apk");
 
                             Loading = "false";
-
-                            await AndroidUtils.VerifyAppDownload(streamAPK, arquivoApk.Name);
+                            return;
+                        }
+                        else
+                        {
+                            await RequestDownloadFileVR(baseUrl, httpClient);
                         }
                     }
                 }
@@ -136,6 +134,43 @@ namespace MauiAppVisit.ViewModel
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
+        }
+
+        private async Task RequestDownloadFileVR(string baseUrl, HttpClient httpClient)
+        {
+            string url = $"{baseUrl}/FileVR/{Idarquivo}";
+            var responseFile = await httpClient.GetAsync(url);
+
+            if (responseFile.IsSuccessStatusCode)
+            {
+                var responseContent = await responseFile.Content.ReadAsStreamAsync();
+                using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
+                {
+                    AndroidUtils.GrantedPermission();
+
+                    var arquivoApk = arquivos.Entries[0];
+                    var streamAPK = arquivoApk.Open();
+
+                    Loading = "false";
+
+                    await AndroidUtils.DownloadApk(streamAPK, arquivoApk.Name);
+                }
+            }
+        }
+
+        private async Task<FileVrDetails> RequestFileVrDetails(string baseUrl, HttpClient httpClient)
+        {
+            var url = $"{baseUrl}/FileVR/dadosArquivos/{Idarquivo}";
+            var responseDetailsFileVR = await httpClient.GetAsync(url);
+
+            if (responseDetailsFileVR.IsSuccessStatusCode)
+            {
+                var responseContentFileVrDetailsStream = await responseDetailsFileVR.Content.ReadAsStringAsync();
+                var fileVrDetailsList = JsonSerializer.Deserialize<List<FileVrDetails>>(responseContentFileVrDetailsStream);
+                return fileVrDetailsList[0];
+            }
+
+            return new FileVrDetails();
         }
     }
 }
