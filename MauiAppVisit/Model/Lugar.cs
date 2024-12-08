@@ -2,12 +2,12 @@
 {
     public class Lugar
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
-        public int fileVRId { get; set; }
-        public string image { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int FileVRId { get; set; }
+        public string Image { get; set; }
         public byte[] ImagemByte { get; set; }
-        public string fileName { get; set; }
+        public string FileName { get; set; }
     }
 }

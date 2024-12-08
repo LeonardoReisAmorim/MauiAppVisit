@@ -9,6 +9,7 @@ namespace MauiAppVisit.ViewModel
     public partial class UsuarioViewModel : ObservableObject
     {
         private HttpHelper HttpHelper { get; set; }
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         [ObservableProperty]
         private int _id;
@@ -29,6 +30,7 @@ namespace MauiAppVisit.ViewModel
         {
             HttpHelper = new HttpHelper();
             Loading = "false";
+            _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
         }
 
         public ICommand RegisterCommand => new Command(async () => await RegisterAsync());
@@ -52,16 +54,18 @@ namespace MauiAppVisit.ViewModel
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     Loading = "false";
-                    await Shell.Current.DisplayAlert("teste", content, "OK");
+                    await Shell.Current.DisplayAlert("Erro", content, "OK");
                     return;
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
                     var contentResponse = await response.Content.ReadAsStringAsync();
-                    var userToken = JsonSerializer.Deserialize<UserToken>(contentResponse);
 
-                    await AuthorizationHelper.SetDataUser(userToken.token, userToken.usuarioId);
+                    var userToken = JsonSerializer.Deserialize<UserToken>(contentResponse, _jsonSerializerOptions);
+
+                    await AuthorizationHelper.SetDataUser(userToken.Token, userToken.UsuarioId);
+                    await GetUser(userToken.UsuarioId);
 
                     Loading = "false";
 
@@ -100,19 +104,53 @@ namespace MauiAppVisit.ViewModel
                 if (response.IsSuccessStatusCode)
                 {
                     var contentResponse = await response.Content.ReadAsStringAsync();
-                    var userToken = JsonSerializer.Deserialize<UserToken>(contentResponse);
+                    var userToken = JsonSerializer.Deserialize<UserToken>(contentResponse, _jsonSerializerOptions);
 
-                    await AuthorizationHelper.SetDataUser(userToken.token, userToken.usuarioId);
+                    await AuthorizationHelper.SetDataUser(userToken.Token, userToken.UsuarioId);
+                    await GetUser(userToken.UsuarioId);
 
                     Loading = "false";
 
                     await Shell.Current.GoToAsync("//Locations", true);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Loading = "false";
                 await Shell.Current.DisplayAlert("Erro", "Ocorreu um erro, por favor tente novamente mais tarde!", "OK");
+            }
+        }
+
+        private async Task GetUser(int id)
+        {
+            var baseUrl = HttpHelper.GetBaseUrl();
+            var httpClient = await HttpHelper.GetHttpClient();
+
+            var url = $"{baseUrl}/User/getUserById/{id}";
+
+            try
+            {
+                var response = await httpClient.GetAsync(url);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Loading = "false";
+                    return;
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsStringAsync();
+                    Usuario usuario = JsonSerializer.Deserialize<Usuario>(result, _jsonSerializerOptions);
+
+                    PreferencesHelper.SetData("UserName", usuario.Name);
+                    PreferencesHelper.SetData("userIsAdmin", usuario.IsAdmin.ToString());
+                    PreferencesHelper.SetData("userEmail", usuario.Email);
+                }
+            }
+            catch (Exception ex)
+            {
+                Loading = "false";
             }
         }
     }

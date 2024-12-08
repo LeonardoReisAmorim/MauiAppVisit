@@ -25,9 +25,13 @@
            BackgroundColor="White">
 
             <VerticalStackLayout>
-                <Entry Placeholder="Email"
+                <Entry 
+                   Placeholder="Email"
+                   TextColor="Black"
                    Text="{Binding Email}"/>
-                <Entry Placeholder="Senha"
+                <Entry 
+                   Placeholder="Senha"
+                   TextColor="Black"
                    IsPassword="True"
                    Text="{Binding Password}"/>
             </VerticalStackLayout>

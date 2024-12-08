@@ -13,6 +13,7 @@ namespace MauiAppVisit.ViewModel
     public partial class LocationDetailsViewModel : ObservableObject
     {
         private HttpHelper HttpHelper { get; set; }
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         private readonly int IdLugar;
         private int Idarquivo;
@@ -44,6 +45,7 @@ namespace MauiAppVisit.ViewModel
             HttpHelper = new HttpHelper();
             Loading = "true";
             Aviso = "";
+            _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
         }
 
         public async Task GetLocationDetailsById()
@@ -61,14 +63,14 @@ namespace MauiAppVisit.ViewModel
                 {
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
-                        var data = await JsonSerializer.DeserializeAsync<List<Lugar>>(responseStream);
+                        var data = await JsonSerializer.DeserializeAsync<List<Lugar>>(responseStream, _jsonSerializerOptions);
 
-                        Idarquivo = data[0].fileVRId;
-                        DescriptionPlace = data[0].description;
-                        Nome = data[0].name;
-                        ImagePlaceByte = Convert.FromBase64String(data[0].image);
+                        Idarquivo = data[0].FileVRId;
+                        DescriptionPlace = data[0].Description;
+                        Nome = data[0].Name;
+                        ImagePlaceByte = Convert.FromBase64String(data[0].Image);
                         IdLugarInfo = IdLugar.ToString();
-                        NameButton = AndroidUtils.HasAppInstalledButton(data[0].fileName) ? "INICIAR" : "BAIXAR";
+                        NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
                     }
                     Loading = "false";
                 }
@@ -98,12 +100,12 @@ namespace MauiAppVisit.ViewModel
 
                 if (needUpdateAPK)
                 {
-                    AndroidUtils.DeleteAppInDevice($"{fileVrDetails.fileName}.apk");
+                    AndroidUtils.DeleteAppInDevice($"{fileVrDetails.FileName}.apk");
                     await RequestDownloadFileVR(baseUrl, httpClient);
                 }
                 else
                 {
-                    bool hasInstalled = AndroidUtils.VerifyAppInstaled($"{fileVrDetails.fileName}.apk");
+                    bool hasInstalled = AndroidUtils.VerifyAppInstaled($"{fileVrDetails.FileName}.apk");
 
                     if (hasInstalled)
                     {
@@ -113,11 +115,11 @@ namespace MauiAppVisit.ViewModel
 
                     if (!hasInstalled)
                     {
-                        bool hasAppInDevice = AndroidUtils.HasAppInDevice($"{fileVrDetails.fileName}.apk");
+                        bool hasAppInDevice = AndroidUtils.HasAppInDevice($"{fileVrDetails.FileName}.apk");
 
                         if (hasAppInDevice)
                         {
-                            AndroidUtils.InstallApk($"{fileVrDetails.fileName}.apk");
+                            AndroidUtils.InstallApk($"{fileVrDetails.FileName}.apk");
 
                             Loading = "false";
                             return;
@@ -166,7 +168,7 @@ namespace MauiAppVisit.ViewModel
             if (responseDetailsFileVR.IsSuccessStatusCode)
             {
                 var responseContentFileVrDetailsStream = await responseDetailsFileVR.Content.ReadAsStringAsync();
-                var fileVrDetailsList = JsonSerializer.Deserialize<List<FileVrDetails>>(responseContentFileVrDetailsStream);
+                var fileVrDetailsList = JsonSerializer.Deserialize<List<FileVrDetails>>(responseContentFileVrDetailsStream, _jsonSerializerOptions);
                 return fileVrDetailsList[0];
             }
 

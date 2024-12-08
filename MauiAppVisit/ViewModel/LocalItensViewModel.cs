@@ -9,6 +9,7 @@ namespace MauiAppVisit.ViewModel
     public partial class LocalItensViewModel : ObservableObject
     {
         HttpHelper HttpHelper { get; set; }
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         [ObservableProperty]
         public ObservableCollection<Lugar> _lugares;
@@ -19,11 +20,16 @@ namespace MauiAppVisit.ViewModel
         [ObservableProperty]
         private string _avisoErro;
 
+        [ObservableProperty]
+        private string _userName;
+
         public LocalItensViewModel()
         {
             HttpHelper = new HttpHelper();
             Loading = "true";
             AvisoErro = "";
+            UserName = $"Olá {PreferencesHelper.GetData("UserName")}";
+            _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
         }
 
         public async Task CarregaLugaresAsync()
@@ -47,7 +53,7 @@ namespace MauiAppVisit.ViewModel
                 {
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
-                        var data = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream);
+                        var data = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream, _jsonSerializerOptions);
                         Lugares = data;
 
                         if (!Lugares.Any())
@@ -58,7 +64,7 @@ namespace MauiAppVisit.ViewModel
                         {
                             foreach (var item in Lugares)
                             {
-                                item.ImagemByte = Convert.FromBase64String(item.image);
+                                item.ImagemByte = Convert.FromBase64String(item.Image);
                             }
                         }
                     }

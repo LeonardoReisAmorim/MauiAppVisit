@@ -17,20 +17,12 @@ namespace MauiAppVisit.Platforms.Android
     {
         private static readonly string _basePath = Application.Context.GetExternalFilesDir(null).AbsolutePath;
         private static readonly PackageManager _packageManager = Application.Context.PackageManager;
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
 
         public static void CreateFileJsonFileVRVersion()
         {
             FileHelper.CreateFileJSONInDevice(_basePath);
         }
-
-        //public static bool NeedUpdateAPK(FileVrDetails fileVrDetails)
-        //{
-        //    var contentFile = FileHelper.ReadJsonVRVersion(_basePath);
-        //    if (string.IsNullOrWhiteSpace(contentFile)) return false;
-
-        //    var fileVrDetailsListInDevice = JsonSerializer.Deserialize<List<FileVRInstalled>>(contentFile);
-        //    return fileVrDetailsListInDevice.Any(filevrdevice => filevrdevice.fileName.Equals(fileVrDetails.fileName, StringComparison.OrdinalIgnoreCase) && !DateHelper.AreEquals(fileVrDetails.updatedAt, filevrdevice.updatedAt));
-        //}
 
         public static bool NeedUpdateAPK(FileVrDetails fileVrDetails)
         {
@@ -39,14 +31,14 @@ namespace MauiAppVisit.Platforms.Android
             var contentFile = FileHelper.ReadJsonVRVersion(_basePath);
             if (!string.IsNullOrWhiteSpace(contentFile))
             {
-                fileVrDetailsList = JsonSerializer.Deserialize<List<FileVRInstalled>>(contentFile);
+                fileVrDetailsList = JsonSerializer.Deserialize<List<FileVRInstalled>>(contentFile, _jsonSerializerOptions);
 
-                if(fileVrDetailsList.Any(filevrdevice => filevrdevice.fileName.Equals(fileVrDetails.fileName, StringComparison.OrdinalIgnoreCase) && DateHelper.AreEquals(fileVrDetails.updatedAt, filevrdevice.updatedAt)))
+                if(fileVrDetailsList.Any(filevrdevice => filevrdevice.FileName.Equals(fileVrDetails.FileName, StringComparison.OrdinalIgnoreCase) && DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt)))
                 {
                     return needUpdateAPK;
                 }
 
-                var itemRemoveFileVR = fileVrDetailsList.FirstOrDefault(filevrdevice => filevrdevice.fileName.Equals(fileVrDetails.fileName, StringComparison.OrdinalIgnoreCase) && !DateHelper.AreEquals(fileVrDetails.updatedAt, filevrdevice.updatedAt));
+                var itemRemoveFileVR = fileVrDetailsList.FirstOrDefault(filevrdevice => filevrdevice.FileName.Equals(fileVrDetails.FileName, StringComparison.OrdinalIgnoreCase) && !DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt));
                 if (itemRemoveFileVR is not null)
                 {
                     needUpdateAPK = true;
@@ -55,16 +47,16 @@ namespace MauiAppVisit.Platforms.Android
                     
                 fileVrDetailsList.Add(new FileVRInstalled
                 {
-                    fileName = fileVrDetails.fileName,
-                    updatedAt = fileVrDetails.updatedAt
+                    FileName = fileVrDetails.FileName,
+                    UpdatedAt = fileVrDetails.UpdatedAt
                 });
             }
             else
             {
                 fileVrDetailsList.Add(new FileVRInstalled
                 {
-                    fileName = fileVrDetails.fileName,
-                    updatedAt = fileVrDetails.updatedAt
+                    FileName = fileVrDetails.FileName,
+                    UpdatedAt = fileVrDetails.UpdatedAt
                 });
             }
             FileHelper.WriteJsonVRVersion(_basePath, JsonSerializer.Serialize(fileVrDetailsList));
@@ -107,7 +99,7 @@ namespace MauiAppVisit.Platforms.Android
 
         public static bool HasAppInstalledButton(string filename)
         {
-            var packages = _packageManager.GetInstalledApplications(PackageInfoFlags.MetaData);
+            var packages = _packageManager.GetInstalledApplications(PackageInfoFlags.MetaData).AsParallel();
             return packages.Any(p => p.LoadLabel(_packageManager).ToString().Equals(filename, StringComparison.OrdinalIgnoreCase));
         }
 
