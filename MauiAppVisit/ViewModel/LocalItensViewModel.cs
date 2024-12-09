@@ -15,6 +15,9 @@ namespace MauiAppVisit.ViewModel
         public ObservableCollection<Lugar> _lugares;
 
         [ObservableProperty]
+        public ObservableCollection<TypePlace> _typePlaces;
+
+        [ObservableProperty]
         private string _loading;
 
         [ObservableProperty]
@@ -30,6 +33,14 @@ namespace MauiAppVisit.ViewModel
             AvisoErro = "";
             UserName = $"Olá {PreferencesHelper.GetData("UserName")}";
             _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
+            TypePlaces = new ObservableCollection<TypePlace>
+            {
+                new TypePlace { Id = 1, Type = "Museus", ImageUrl = "museu.png" },
+                new TypePlace { Id = 2, Type = "Eventos", ImageUrl = "evento.png" },
+                new TypePlace { Id = 3, Type = "Faculdades", ImageUrl = "faculdade.png" },
+                new TypePlace { Id = 4, Type = "Faculdades", ImageUrl = "faculdade.png" },
+                new TypePlace { Id = 5, Type = "Faculdades", ImageUrl = "faculdade.png" }
+            };
         }
 
         public async Task CarregaLugaresAsync()

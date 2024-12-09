@@ -5,12 +5,12 @@ namespace MauiAppVisit.View;
 public partial class Locations : ContentPage
 {
     private readonly LocalItensViewModel _localItensViewModel;
+
     public Locations()
 	{
 		InitializeComponent();
         _localItensViewModel = new LocalItensViewModel();
-        BindingContext = _localItensViewModel;
-        BackgroundColor = Color.FromRgb(36, 87, 255);
+        BindingContext = _localItensViewModel;  
     }
 
     protected override async void OnAppearing()

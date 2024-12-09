@@ -11,30 +11,36 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#21279c" Offset="0.0" />
+            <GradientStop Color="#06081c" Offset="0.21" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
     <ScrollView>
         <StackLayout>
-            <Grid>
+            <Grid Margin="50, 20, 0, 20">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="200"></RowDefinition>
+                    <RowDefinition Height="70"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                
-                <Image Source="imagempaginainicial.jpg"
-                       Aspect="AspectFill"
-                       HeightRequest="100"
-                       Grid.Row="1"
-                       Grid.Column="1"
-                       WidthRequest="100"></Image>
 
                 <Image Source="imagempaginainicial.jpg"
                        Aspect="AspectFill"
-                       HeightRequest="100"
-                       Grid.Row="1"
-                       Grid.Column="2"
-                       WidthRequest="100"></Image>
+                       MaximumWidthRequest="100"
+                       MaximumHeightRequest="100"
+                       HorizontalOptions="Start"
+                       VerticalOptions="Start">
+                        <Image.Clip>
+                            <EllipseGeometry
+                                Center="25,25"
+                                RadiusX="25"
+                                RadiusY="25" />
+                        </Image.Clip>
+                </Image>
             </Grid>
 
             <Label  Text="{Binding UserName}"
@@ -48,18 +54,40 @@
                     FontAttributes="Bold"
                     Margin="50, 30, 0, 0"></Label>
 
+            <CollectionView ItemsSource="{Binding TypePlaces}" Margin="25,0,0,0">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border WidthRequest="160"
+                                HeightRequest="45"
+                                StrokeShape="RoundRectangle 50"
+                                Margin="20,20,0,50">
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="70"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Image Source="{Binding ImageUrl}" WidthRequest="35" HeightRequest="35" BackgroundColor="White"></Image>
+                                <Label Text="{Binding Type}" Grid.Column="1" TextColor="White" HorizontalOptions="Start" VerticalOptions="Center"></Label>
+                            </Grid>
+
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
 
             <CollectionView ItemsSource="{Binding Lugares}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <VerticalStackLayout Margin="50, 0, 50, 20">
-
-                            <Label
-                            FontSize="18"
-                            TextColor="White"
-                            Text="{Binding Name}"
-                            HorizontalOptions="Start"
-                            Margin="10,10,0,0"/>
 
                             <ImageButton
                             Source="{Binding ImagemByte, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}"
@@ -67,7 +95,13 @@
                             MaximumHeightRequest="500"
                             CommandParameter="{Binding Id}"
                             Clicked="ImageButton_Clicked"
-                            CornerRadius="20"/> 
+                            />
+
+                            <Label FontSize="18"
+                                   TextColor="White"
+                                   Text="{Binding Name}"
+                                   HorizontalOptions="Center"
+                                   Margin="0,5,0,0"/>
 
                         </VerticalStackLayout>
                     </DataTemplate>

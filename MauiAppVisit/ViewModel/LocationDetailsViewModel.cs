@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Maui.Storage;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
+#if ANDROID
 using MauiAppVisit.Platforms.Android;
+#endif
 using System.IO.Compression;
-using System.Net.Http;
 using System.Text.Json;
 using System.Windows.Input;
 
@@ -70,7 +70,9 @@ namespace MauiAppVisit.ViewModel
                         Nome = data[0].Name;
                         ImagePlaceByte = Convert.FromBase64String(data[0].Image);
                         IdLugarInfo = IdLugar.ToString();
-                        NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
+#if ANDROID
+                            NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
+#endif
                     }
                     Loading = "false";
                 }
@@ -90,7 +92,9 @@ namespace MauiAppVisit.ViewModel
             Aviso = "";
             var baseUrl = HttpHelper.GetBaseUrl();
             var httpClient = await HttpHelper.GetHttpClient();
+            #if ANDROID
             AndroidUtils.CreateFileJsonFileVRVersion();
+            
 
             try
             {
@@ -136,6 +140,7 @@ namespace MauiAppVisit.ViewModel
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
+            #endif
         }
 
         private async Task RequestDownloadFileVR(string baseUrl, HttpClient httpClient)
@@ -148,14 +153,18 @@ namespace MauiAppVisit.ViewModel
                 var responseContent = await responseFile.Content.ReadAsStreamAsync();
                 using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
                 {
+                    #if ANDROID
                     AndroidUtils.GrantedPermission();
+                    #endif
 
                     var arquivoApk = arquivos.Entries[0];
                     var streamAPK = arquivoApk.Open();
 
                     Loading = "false";
 
+                    #if ANDROID
                     await AndroidUtils.DownloadApk(streamAPK, arquivoApk.Name);
+                    #endif
                 }
             }
         }
