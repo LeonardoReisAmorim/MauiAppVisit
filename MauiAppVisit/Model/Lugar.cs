@@ -9,5 +9,6 @@
         public string Image { get; set; }
         public byte[] ImagemByte { get; set; }
         public string FileName { get; set; }
+        public int TypePlaceId { get; set; }
     }
 }

@@ -50,20 +50,24 @@
 
             <Label  Text="Qual lugar deseja visitar?"
                     TextColor="White"
-                    FontSize="Body"
+                    FontSize="Large"
                     FontAttributes="Bold"
                     Margin="50, 30, 0, 0"></Label>
 
-            <CollectionView ItemsSource="{Binding TypePlaces}" Margin="25,0,0,0">
+            <CollectionView 
+                ItemsSource="{Binding TypePlaces}" 
+                Margin="25,0,0,0"
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedItem}">
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Horizontal" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Border WidthRequest="160"
-                                HeightRequest="45"
+                                HeightRequest="40"
                                 StrokeShape="RoundRectangle 50"
-                                Margin="20,20,0,50">
+                                Margin="20,10,0,50">
 
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -74,8 +78,10 @@
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
 
-                                <Image Source="{Binding ImageUrl}" WidthRequest="35" HeightRequest="35" BackgroundColor="White"></Image>
-                                <Label Text="{Binding Type}" Grid.Column="1" TextColor="White" HorizontalOptions="Start" VerticalOptions="Center"></Label>
+                                <Image Source="{Binding Image, Mode=OneWay, Converter={StaticResource ByteArrayToImageSourceConverter}}" 
+                                       WidthRequest="25" 
+                                       HeightRequest="25"></Image>
+                                <Label Text="{Binding Type}" Grid.Column="1" TextColor="White" HorizontalOptions="Start" VerticalOptions="Center" FontAttributes="Bold"></Label>
                             </Grid>
 
                         </Border>
@@ -100,7 +106,7 @@
                             <Label FontSize="18"
                                    TextColor="White"
                                    Text="{Binding Name}"
-                                   HorizontalOptions="Center"
+                                   HorizontalOptions="Start"
                                    Margin="0,5,0,0"/>
 
                         </VerticalStackLayout>

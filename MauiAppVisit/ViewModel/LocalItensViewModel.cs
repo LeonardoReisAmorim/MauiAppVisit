@@ -11,11 +11,16 @@ namespace MauiAppVisit.ViewModel
         HttpHelper HttpHelper { get; set; }
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
+        private ObservableCollection<Lugar> _originalPlaces;
+
         [ObservableProperty]
         public ObservableCollection<Lugar> _lugares;
 
         [ObservableProperty]
         public ObservableCollection<TypePlace> _typePlaces;
+
+        [ObservableProperty]
+        private TypePlace _selectedItem;
 
         [ObservableProperty]
         private string _loading;
@@ -33,14 +38,6 @@ namespace MauiAppVisit.ViewModel
             AvisoErro = "";
             UserName = $"Olá {PreferencesHelper.GetData("UserName")}";
             _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
-            TypePlaces = new ObservableCollection<TypePlace>
-            {
-                new TypePlace { Id = 1, Type = "Museus", ImageUrl = "museu.png" },
-                new TypePlace { Id = 2, Type = "Eventos", ImageUrl = "evento.png" },
-                new TypePlace { Id = 3, Type = "Faculdades", ImageUrl = "faculdade.png" },
-                new TypePlace { Id = 4, Type = "Faculdades", ImageUrl = "faculdade.png" },
-                new TypePlace { Id = 5, Type = "Faculdades", ImageUrl = "faculdade.png" }
-            };
         }
 
         public async Task CarregaLugaresAsync()
@@ -64,8 +61,8 @@ namespace MauiAppVisit.ViewModel
                 {
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
-                        var data = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream, _jsonSerializerOptions);
-                        Lugares = data;
+                        _originalPlaces = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream, _jsonSerializerOptions);
+                        Lugares = _originalPlaces;
 
                         if (!Lugares.Any())
                         {
@@ -87,7 +84,53 @@ namespace MauiAppVisit.ViewModel
                 Loading = "false";
                 AvisoErro = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
-            
         }
+
+        public async Task CarregaTipoDeLugaresAsync()
+        {
+            var baseUrl = HttpHelper.GetBaseUrl();
+            var htppClient = await HttpHelper.GetHttpClient();
+
+            var url = $"{baseUrl}/TypePlace";
+
+            try
+            {
+                var response = await htppClient.GetAsync(url);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Loading = "false";
+                    AvisoErro = "Usuario nao autorizado!";
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        var data = await JsonSerializer.DeserializeAsync<ObservableCollection<TypePlace>>(responseStream, _jsonSerializerOptions);
+                        TypePlaces = data;
+                    }
+                    Loading = "false";
+                }
+            }
+            catch (Exception)
+            {
+                Loading = "false";
+                AvisoErro = "Servidor indisponível, por favor tente novamente mais tarde!";
+            }
+        }
+
+        partial void OnSelectedItemChanged(TypePlace value)
+        {
+            if(value == null)
+            {
+                return;
+            }
+
+            Lugares = new ObservableCollection<Lugar>(_originalPlaces.Where(p => p.TypePlaceId == value.Id));
+            SelectedItem = null;
+        }
+
+        
     }
 }

@@ -16,6 +16,7 @@ public partial class Locations : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await _localItensViewModel.CarregaTipoDeLugaresAsync();
         await _localItensViewModel.CarregaLugaresAsync();
     }
 

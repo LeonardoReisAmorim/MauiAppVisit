@@ -8,7 +8,7 @@ namespace MauiAppVisit.Helpers
 {
     public static class FileHelper
     {
-        private static string _fileName = "filevrinstalled.json";
+        private static readonly string _fileName = "filevrinstalled.json";
         public static void CreateFileJSONInDevice(string path)
         {
             string filePath = Path.Combine(path, _fileName);
