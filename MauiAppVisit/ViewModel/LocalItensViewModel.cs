@@ -108,6 +108,11 @@ namespace MauiAppVisit.ViewModel
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
                         var data = await JsonSerializer.DeserializeAsync<ObservableCollection<TypePlace>>(responseStream, _jsonSerializerOptions);
+                        data.Add(new TypePlace
+                        {
+                            Id = 0,
+                            Type = "Todos"
+                        });
                         TypePlaces = data;
                     }
                     Loading = "false";
@@ -124,6 +129,13 @@ namespace MauiAppVisit.ViewModel
         {
             if(value == null)
             {
+                return;
+            }
+
+            if (value.Id == 0)
+            {
+                Lugares = _originalPlaces;
+                SelectedItem = null;
                 return;
             }
 
