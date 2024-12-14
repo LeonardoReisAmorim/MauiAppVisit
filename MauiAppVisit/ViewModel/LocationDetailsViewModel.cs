@@ -71,13 +71,13 @@ namespace MauiAppVisit.ViewModel
                         ImagePlaceByte = Convert.FromBase64String(data[0].Image);
                         IdLugarInfo = IdLugar.ToString();
 #if ANDROID
-                            NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
+                        //NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
 #endif
                     }
                     Loading = "false";
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
@@ -92,55 +92,28 @@ namespace MauiAppVisit.ViewModel
             Aviso = "";
             var baseUrl = HttpHelper.GetBaseUrl();
             var httpClient = await HttpHelper.GetHttpClient();
-            #if ANDROID
-            AndroidUtils.CreateFileJsonFileVRVersion();
-            
 
             try
             {
                 FileVrDetails fileVrDetails = await RequestFileVrDetails(baseUrl, httpClient);
 
-                bool needUpdateAPK = AndroidUtils.NeedUpdateAPK(fileVrDetails);
+                #if ANDROID
+                bool processFileVR = AndroidUtils.ProcessFileVR(fileVrDetails);
 
-                if (needUpdateAPK)
+                if (!processFileVR)
                 {
-                    AndroidUtils.DeleteAppInDevice($"{fileVrDetails.FileName}.apk");
                     await RequestDownloadFileVR(baseUrl, httpClient);
+                    return;
                 }
-                else
-                {
-                    bool hasInstalled = AndroidUtils.VerifyAppInstaled($"{fileVrDetails.FileName}.apk");
+                #endif
 
-                    if (hasInstalled)
-                    {
-                        Loading = "false";
-                        return;
-                    }
-
-                    if (!hasInstalled)
-                    {
-                        bool hasAppInDevice = AndroidUtils.HasAppInDevice($"{fileVrDetails.FileName}.apk");
-
-                        if (hasAppInDevice)
-                        {
-                            AndroidUtils.InstallApk($"{fileVrDetails.FileName}.apk");
-
-                            Loading = "false";
-                            return;
-                        }
-                        else
-                        {
-                            await RequestDownloadFileVR(baseUrl, httpClient);
-                        }
-                    }
-                }
+                Loading = "false";
             }
-            catch(Exception)
+            catch(Exception ex)
             {
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
-            #endif
         }
 
         private async Task RequestDownloadFileVR(string baseUrl, HttpClient httpClient)
@@ -163,7 +136,7 @@ namespace MauiAppVisit.ViewModel
                     Loading = "false";
 
                     #if ANDROID
-                    await AndroidUtils.DownloadApk(streamAPK, arquivoApk.Name);
+                    await AndroidUtils.DownloadApk(streamAPK, arquivoApk.Name.ToLower());
                     #endif
                 }
             }

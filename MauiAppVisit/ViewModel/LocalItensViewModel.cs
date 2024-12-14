@@ -111,7 +111,7 @@ namespace MauiAppVisit.ViewModel
                         data.Add(new TypePlace
                         {
                             Id = 0,
-                            Type = "Todos"
+                            Type = "Todos",
                         });
                         TypePlaces = data;
                     }

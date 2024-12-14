@@ -16,13 +16,47 @@ namespace MauiAppVisit.Platforms.Android
         private static readonly string _basePath = Application.Context.GetExternalFilesDir(null).AbsolutePath;
         private static readonly PackageManager _packageManager = Application.Context.PackageManager;
         private static readonly JsonSerializerOptions _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
+        private static string _packageName = string.Empty;
 
-        public static void CreateFileJsonFileVRVersion()
+        public static bool ProcessFileVR(FileVrDetails fileVrDetails)
+        {
+            string filePath = Path.Combine(_basePath, $"{StringHelper.RemoveAccents(fileVrDetails.FileName.ToLower())}.apk");
+            CreateFileJsonFileVRVersion();
+
+            if(string.IsNullOrWhiteSpace(_packageName)) return false;
+
+            bool needUpdateApk = NeedUpdateAPK(fileVrDetails, _packageName);
+
+            if (needUpdateApk)
+            {
+                DeleteAppInDevice(filePath);
+                return false;
+            }
+
+            bool hasInstalled = VerifyAppInstaled(filePath);
+
+            if (hasInstalled)
+            {
+                return true;
+            }
+
+            bool hasAppInDevice = HasAppInDevice(filePath);
+
+            if (hasAppInDevice)
+            {
+                InstallApk(filePath);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static void CreateFileJsonFileVRVersion()
         {
             FileHelper.CreateFileJSONInDevice(_basePath);
         }
 
-        public static bool NeedUpdateAPK(FileVrDetails fileVrDetails)
+        public static bool NeedUpdateAPK(FileVrDetails fileVrDetails, string packageName)
         {
             List<FileVRInstalled> fileVrDetailsList = [];
             bool needUpdateAPK = false;
@@ -31,12 +65,12 @@ namespace MauiAppVisit.Platforms.Android
             {
                 fileVrDetailsList = JsonSerializer.Deserialize<List<FileVRInstalled>>(contentFile, _jsonSerializerOptions);
 
-                if(fileVrDetailsList.Any(filevrdevice => filevrdevice.FileName.Equals(fileVrDetails.FileName, StringComparison.OrdinalIgnoreCase) && DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt)))
+                if(fileVrDetailsList.Any(filevrdevice => filevrdevice.PackageName.Equals(packageName, StringComparison.OrdinalIgnoreCase) && DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt)))
                 {
                     return needUpdateAPK;
                 }
 
-                var itemRemoveFileVR = fileVrDetailsList.FirstOrDefault(filevrdevice => filevrdevice.FileName.Equals(fileVrDetails.FileName, StringComparison.OrdinalIgnoreCase) && !DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt));
+                var itemRemoveFileVR = fileVrDetailsList.FirstOrDefault(filevrdevice => filevrdevice.PackageName.Equals(packageName, StringComparison.OrdinalIgnoreCase) && !DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt));
                 if (itemRemoveFileVR is not null)
                 {
                     needUpdateAPK = true;
@@ -46,7 +80,8 @@ namespace MauiAppVisit.Platforms.Android
                 fileVrDetailsList.Add(new FileVRInstalled
                 {
                     FileName = fileVrDetails.FileName,
-                    UpdatedAt = fileVrDetails.UpdatedAt
+                    UpdatedAt = fileVrDetails.UpdatedAt,
+                    PackageName = packageName
                 });
             }
             else
@@ -54,7 +89,8 @@ namespace MauiAppVisit.Platforms.Android
                 fileVrDetailsList.Add(new FileVRInstalled
                 {
                     FileName = fileVrDetails.FileName,
-                    UpdatedAt = fileVrDetails.UpdatedAt
+                    UpdatedAt = fileVrDetails.UpdatedAt,
+                    PackageName = packageName
                 });
             }
             FileHelper.WriteJsonVRVersion(_basePath, JsonSerializer.Serialize(fileVrDetailsList));
@@ -73,9 +109,8 @@ namespace MauiAppVisit.Platforms.Android
             }
         }
 
-        public static bool VerifyAppInstaled(string filename)
+        public static bool VerifyAppInstaled(string filePath)
         {
-            var filePath = Path.Combine(_basePath, filename);
             try
             {
                 var packageInfo = _packageManager.GetPackageArchiveInfo(filePath, PackageInfoFlags.Activities) ?? throw new NullReferenceException();
@@ -102,12 +137,11 @@ namespace MauiAppVisit.Platforms.Android
         {
             var filePath = Path.Combine(_basePath, filename);
             await SaveApkFromStreamAsync(stream, filePath);
-            InstallApk(null, filePath);
+            InstallApk(filePath);
         }
 
-        public static bool HasAppInDevice(string filename)
+        public static bool HasAppInDevice(string filePath)
         {
-            var filePath = Path.Combine(_basePath, filename);
             return File.Exists(filePath);
         }
 
@@ -123,21 +157,23 @@ namespace MauiAppVisit.Platforms.Android
             await stream.CopyToAsync(fileStream);
         }
 
-        public static void InstallApk(string filename, string filepathDownloadApk = null)
+        public static void InstallApk(string filepathDownloadApk)
         {
-            var filePathInstall = string.Empty;
-            if (!string.IsNullOrWhiteSpace(filename))
-            {
-                filePathInstall = Path.Combine(_basePath, filename);
-            }
-
-            var file = new Java.IO.File(filepathDownloadApk ?? filePathInstall);
+            var file = new Java.IO.File(filepathDownloadApk);
             var fileUri = FileProvider.GetUriForFile(Application.Context, $"{Application.Context.ApplicationContext.PackageName}.fileprovider", file);
 
             var intent = new Intent(Intent.ActionView);
             intent.SetDataAndType(fileUri, "application/vnd.android.package-archive");
             intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
             Application.Context.StartActivity(intent);
+
+            _packageName = GetNameApkFromPackageManager(filepathDownloadApk);
+        }
+
+        private static string GetNameApkFromPackageManager(string filePath)
+        {
+            var packageInfo = _packageManager.GetPackageArchiveInfo(filePath, PackageInfoFlags.Activities) ?? throw new NullReferenceException();
+            return packageInfo?.PackageName;
         }
 
         private static void InicializeAPK(string packageName, PackageInfo packageInfo)
