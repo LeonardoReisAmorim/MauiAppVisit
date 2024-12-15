@@ -102,7 +102,7 @@ namespace MauiAppVisit.ViewModel
 
                 if (!processFileVR)
                 {
-                    await RequestDownloadFileVR(baseUrl, httpClient);
+                    await RequestDownloadFileVR(baseUrl, httpClient, fileVrDetails);
                     return;
                 }
                 #endif
@@ -116,7 +116,7 @@ namespace MauiAppVisit.ViewModel
             }
         }
 
-        private async Task RequestDownloadFileVR(string baseUrl, HttpClient httpClient)
+        private async Task RequestDownloadFileVR(string baseUrl, HttpClient httpClient, FileVrDetails fileVrDetails)
         {
             string url = $"{baseUrl}/FileVR/{Idarquivo}";
             var responseFile = await httpClient.GetAsync(url);
@@ -136,7 +136,7 @@ namespace MauiAppVisit.ViewModel
                     Loading = "false";
 
                     #if ANDROID
-                    await AndroidUtils.DownloadApk(streamAPK, arquivoApk.Name.ToLower());
+                    await AndroidUtils.DownloadApk(streamAPK, arquivoApk.Name.ToLower(), fileVrDetails);
                     #endif
                 }
             }

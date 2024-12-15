@@ -16,16 +16,18 @@ namespace MauiAppVisit.Platforms.Android
         private static readonly string _basePath = Application.Context.GetExternalFilesDir(null).AbsolutePath;
         private static readonly PackageManager _packageManager = Application.Context.PackageManager;
         private static readonly JsonSerializerOptions _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
-        private static string _packageName = string.Empty;
+        private static string _contentFileReadJsonVrVersion = string.Empty;
 
         public static bool ProcessFileVR(FileVrDetails fileVrDetails)
         {
-            string filePath = Path.Combine(_basePath, $"{StringHelper.RemoveAccents(fileVrDetails.FileName.ToLower())}.apk");
             CreateFileJsonFileVRVersion();
+            if(string.IsNullOrWhiteSpace(_contentFileReadJsonVrVersion)) _contentFileReadJsonVrVersion = FileHelper.ReadJsonVRVersion(_basePath);
+            string filePath = Path.Combine(_basePath, $"{StringHelper.RemoveAccents(fileVrDetails.FileName.ToLower())}.apk");
+            string packageName = GetNameApkFromPackageManager(filePath);
 
-            if(string.IsNullOrWhiteSpace(_packageName)) return false;
-
-            bool needUpdateApk = NeedUpdateAPK(fileVrDetails, _packageName);
+            if(string.IsNullOrWhiteSpace(packageName)) return false;
+            
+            bool needUpdateApk = NeedUpdateAPK(fileVrDetails, packageName);
 
             if (needUpdateApk)
             {
@@ -58,25 +60,31 @@ namespace MauiAppVisit.Platforms.Android
 
         public static bool NeedUpdateAPK(FileVrDetails fileVrDetails, string packageName)
         {
-            List<FileVRInstalled> fileVrDetailsList = [];
-            bool needUpdateAPK = false;
-            var contentFile = FileHelper.ReadJsonVRVersion(_basePath);
-            if (!string.IsNullOrWhiteSpace(contentFile))
-            {
-                fileVrDetailsList = JsonSerializer.Deserialize<List<FileVRInstalled>>(contentFile, _jsonSerializerOptions);
+            List<FileVRInstalled> fileVrDetailsList = JsonSerializer.Deserialize<List<FileVRInstalled>>(_contentFileReadJsonVrVersion, _jsonSerializerOptions);
 
-                if(fileVrDetailsList.Any(filevrdevice => filevrdevice.PackageName.Equals(packageName, StringComparison.OrdinalIgnoreCase) && DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt)))
-                {
-                    return needUpdateAPK;
-                }
+            if (fileVrDetailsList.Count <= 0) return false;
+
+            if (fileVrDetailsList.Any(filevrdevice => filevrdevice.PackageName.Equals(packageName, StringComparison.OrdinalIgnoreCase) && DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt)))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void CreateJsonVRVersion(FileVrDetails fileVrDetails, string packageName)
+        {
+            List<FileVRInstalled> fileVrDetailsList = [];
+            if (!string.IsNullOrWhiteSpace(_contentFileReadJsonVrVersion))
+            {
+                fileVrDetailsList = JsonSerializer.Deserialize<List<FileVRInstalled>>(_contentFileReadJsonVrVersion, _jsonSerializerOptions);
 
                 var itemRemoveFileVR = fileVrDetailsList.FirstOrDefault(filevrdevice => filevrdevice.PackageName.Equals(packageName, StringComparison.OrdinalIgnoreCase) && !DateHelper.AreEquals(fileVrDetails.UpdatedAt, filevrdevice.UpdatedAt));
                 if (itemRemoveFileVR is not null)
                 {
-                    needUpdateAPK = true;
                     fileVrDetailsList.Remove(itemRemoveFileVR);
                 }
-                    
+
                 fileVrDetailsList.Add(new FileVRInstalled
                 {
                     FileName = fileVrDetails.FileName,
@@ -94,7 +102,6 @@ namespace MauiAppVisit.Platforms.Android
                 });
             }
             FileHelper.WriteJsonVRVersion(_basePath, JsonSerializer.Serialize(fileVrDetailsList));
-            return needUpdateAPK;
         }
 
         public static void GrantedPermission()
@@ -133,11 +140,12 @@ namespace MauiAppVisit.Platforms.Android
             return packages.Any(p => p.LoadLabel(_packageManager).ToString().Equals(filename, StringComparison.OrdinalIgnoreCase));
         }
 
-        public static async Task DownloadApk(Stream stream, string filename)
+        public static async Task DownloadApk(Stream stream, string filename, FileVrDetails fileVrDetails)
         {
             var filePath = Path.Combine(_basePath, filename);
             await SaveApkFromStreamAsync(stream, filePath);
-            InstallApk(filePath);
+            string packageName = InstallApk(filePath);
+            CreateJsonVRVersion(fileVrDetails, packageName);
         }
 
         public static bool HasAppInDevice(string filePath)
@@ -157,7 +165,7 @@ namespace MauiAppVisit.Platforms.Android
             await stream.CopyToAsync(fileStream);
         }
 
-        public static void InstallApk(string filepathDownloadApk)
+        public static string InstallApk(string filepathDownloadApk)
         {
             var file = new Java.IO.File(filepathDownloadApk);
             var fileUri = FileProvider.GetUriForFile(Application.Context, $"{Application.Context.ApplicationContext.PackageName}.fileprovider", file);
@@ -167,12 +175,12 @@ namespace MauiAppVisit.Platforms.Android
             intent.AddFlags(ActivityFlags.GrantReadUriPermission | ActivityFlags.NewTask);
             Application.Context.StartActivity(intent);
 
-            _packageName = GetNameApkFromPackageManager(filepathDownloadApk);
+            return GetNameApkFromPackageManager(filepathDownloadApk);
         }
 
         private static string GetNameApkFromPackageManager(string filePath)
         {
-            var packageInfo = _packageManager.GetPackageArchiveInfo(filePath, PackageInfoFlags.Activities) ?? throw new NullReferenceException();
+            var packageInfo = _packageManager.GetPackageArchiveInfo(filePath, PackageInfoFlags.Activities);
             return packageInfo?.PackageName;
         }
 
