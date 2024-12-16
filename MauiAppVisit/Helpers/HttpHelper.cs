@@ -7,7 +7,7 @@ namespace MauiAppVisit.Helpers
     public class HttpHelper
     {
         readonly HttpClient _httpClient;
-        readonly string baseUrl = "https://ha6xkx83.tunnelite.com"; //http://10.0.2.2:5241 https://apivisitvr.azurewebsites.net
+        readonly string baseUrl = "https://dn3wksa8.tunnelite.com"; //http://10.0.2.2:5241 https://apivisitvr.azurewebsites.net
 
         public HttpHelper()
         {

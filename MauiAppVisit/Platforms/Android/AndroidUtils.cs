@@ -17,11 +17,12 @@ namespace MauiAppVisit.Platforms.Android
         private static readonly PackageManager _packageManager = Application.Context.PackageManager;
         private static readonly JsonSerializerOptions _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
         private static string _contentFileReadJsonVrVersion = string.Empty;
+        private static bool _updateReadFileReadJsonVrVersion = false;
 
         public static bool ProcessFileVR(FileVrDetails fileVrDetails)
         {
             CreateFileJsonFileVRVersion();
-            if(string.IsNullOrWhiteSpace(_contentFileReadJsonVrVersion)) _contentFileReadJsonVrVersion = FileHelper.ReadJsonVRVersion(_basePath);
+            if(string.IsNullOrWhiteSpace(_contentFileReadJsonVrVersion) || _updateReadFileReadJsonVrVersion) _contentFileReadJsonVrVersion = FileHelper.ReadJsonVRVersion(_basePath);
             string filePath = Path.Combine(_basePath, $"{StringHelper.RemoveAccents(fileVrDetails.FileName.ToLower())}.apk");
             string packageName = GetNameApkFromPackageManager(filePath);
 
@@ -102,6 +103,7 @@ namespace MauiAppVisit.Platforms.Android
                 });
             }
             FileHelper.WriteJsonVRVersion(_basePath, JsonSerializer.Serialize(fileVrDetailsList));
+            _updateReadFileReadJsonVrVersion = true;
         }
 
         public static void GrantedPermission()

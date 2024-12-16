@@ -76,6 +76,9 @@ namespace MauiAppVisit.ViewModel
                             }
                         }
                     }
+
+                    await CarregaTipoDeLugaresAsync();
+
                     Loading = "false";
                 }
             }
@@ -115,7 +118,6 @@ namespace MauiAppVisit.ViewModel
                         });
                         TypePlaces = data;
                     }
-                    Loading = "false";
                 }
             }
             catch (Exception)
