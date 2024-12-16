@@ -71,7 +71,7 @@ namespace MauiAppVisit.ViewModel
                         ImagePlaceByte = Convert.FromBase64String(data[0].Image);
                         IdLugarInfo = IdLugar.ToString();
 #if ANDROID
-                        //NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
+                        NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
 #endif
                     }
                     Loading = "false";

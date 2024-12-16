@@ -138,8 +138,20 @@ namespace MauiAppVisit.Platforms.Android
 
         public static bool HasAppInstalledButton(string filename)
         {
-            var packages = _packageManager.GetInstalledApplications(PackageInfoFlags.MetaData).AsParallel();
-            return packages.Any(p => p.LoadLabel(_packageManager).ToString().Equals(filename, StringComparison.OrdinalIgnoreCase));
+            string filePath = Path.Combine(_basePath, $"{StringHelper.RemoveAccents(filename.ToLower())}.apk");
+            string packageName = GetNameApkFromPackageManager(filePath);
+
+            if(string.IsNullOrWhiteSpace(packageName)) return false;
+
+            try
+            {
+                _packageManager.GetPackageInfo(packageName, PackageInfoFlags.Activities);
+                return true;
+            }
+            catch (PackageManager.NameNotFoundException)
+            {
+                return false;
+            }
         }
 
         public static async Task DownloadApk(Stream stream, string filename, FileVrDetails fileVrDetails)

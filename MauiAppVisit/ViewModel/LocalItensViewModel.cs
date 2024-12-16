@@ -42,6 +42,8 @@ namespace MauiAppVisit.ViewModel
 
         public async Task CarregaLugaresAsync()
         {
+            await CarregaTipoDeLugaresAsync();
+
             var baseUrl = HttpHelper.GetBaseUrl();
             var htppClient = await HttpHelper.GetHttpClient();
             
@@ -76,9 +78,6 @@ namespace MauiAppVisit.ViewModel
                             }
                         }
                     }
-
-                    await CarregaTipoDeLugaresAsync();
-
                     Loading = "false";
                 }
             }
