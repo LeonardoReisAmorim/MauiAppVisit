@@ -1,15 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
+using MauiAppVisit.WebServiceHttpClient;
 using System.Collections.ObjectModel;
-using System.Text.Json;
 
 namespace MauiAppVisit.ViewModel
 {
     public partial class LocalItensViewModel : ObservableObject
     {
-        HttpHelper HttpHelper { get; set; }
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private readonly IWebService _webService;
 
         private ObservableCollection<Lugar> _originalPlaces;
 
@@ -31,55 +30,32 @@ namespace MauiAppVisit.ViewModel
         [ObservableProperty]
         private string _userName;
 
-        public LocalItensViewModel()
+        public LocalItensViewModel(IWebService webService)
         {
-            HttpHelper = new HttpHelper();
+            _webService = webService;
             Loading = "true";
             AvisoErro = "";
             UserName = $"Olá {PreferencesHelper.GetData("UserName")}";
-            _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
         }
 
         public async Task CarregaLugaresAsync()
         {
-            await CarregaTipoDeLugaresAsync();
-
-            var baseUrl = HttpHelper.GetBaseUrl();
-            var htppClient = await HttpHelper.GetHttpClient();
-            
-            var url = $"{baseUrl}/Place";
-
             try
             {
-                var response = await htppClient.GetAsync(url);
-
-                if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                _originalPlaces = await _webService.CarregaLugaresAsync();
+                Lugares = _originalPlaces;
+                if (!Lugares.Any())
                 {
-                    Loading = "false";
-                    AvisoErro = "Usuario nao autorizado!";
+                    AvisoErro = "No momento não temos ambientes virtuais disponiveis";
                 }
-
-                if (response.IsSuccessStatusCode)
+                else
                 {
-                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                    foreach (var item in Lugares)
                     {
-                        _originalPlaces = await JsonSerializer.DeserializeAsync<ObservableCollection<Lugar>>(responseStream, _jsonSerializerOptions);
-                        Lugares = _originalPlaces;
-
-                        if (!Lugares.Any())
-                        {
-                            AvisoErro = "No momento não temos ambientes virtuais disponiveis";
-                        }
-                        else
-                        {
-                            foreach (var item in Lugares)
-                            {
-                                item.ImagemByte = Convert.FromBase64String(item.Image);
-                            }
-                        }
+                        item.ImagemByte = Convert.FromBase64String(item.Image);
                     }
-                    Loading = "false";
                 }
+                Loading = "false";
             }
             catch (Exception)
             {
@@ -90,34 +66,15 @@ namespace MauiAppVisit.ViewModel
 
         public async Task CarregaTipoDeLugaresAsync()
         {
-            var baseUrl = HttpHelper.GetBaseUrl();
-            var htppClient = await HttpHelper.GetHttpClient();
-
-            var url = $"{baseUrl}/TypePlace";
-
             try
             {
-                var response = await htppClient.GetAsync(url);
-
-                if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                var data = await _webService.CarregaTipoDeLugaresAsync();
+                data.Add(new TypePlace
                 {
-                    Loading = "false";
-                    AvisoErro = "Usuario nao autorizado!";
-                }
-
-                if (response.IsSuccessStatusCode)
-                {
-                    using (var responseStream = await response.Content.ReadAsStreamAsync())
-                    {
-                        var data = await JsonSerializer.DeserializeAsync<ObservableCollection<TypePlace>>(responseStream, _jsonSerializerOptions);
-                        data.Add(new TypePlace
-                        {
-                            Id = 0,
-                            Type = "Todos",
-                        });
-                        TypePlaces = data;
-                    }
-                }
+                    Id = 0,
+                    Type = "Todos",
+                });
+                TypePlaces = data;
             }
             catch (Exception)
             {
@@ -143,7 +100,5 @@ namespace MauiAppVisit.ViewModel
             Lugares = new ObservableCollection<Lugar>(_originalPlaces.Where(p => p.TypePlaceId == value.Id));
             SelectedItem = null;
         }
-
-        
     }
 }

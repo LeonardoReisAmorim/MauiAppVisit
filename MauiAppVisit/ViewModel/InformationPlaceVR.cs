@@ -1,45 +1,29 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MauiAppVisit.Helpers;
-using System.Text.Json;
+using MauiAppVisit.WebServiceHttpClient;
 
 namespace MauiAppVisit.ViewModel
 {
     public partial class InformationPlaceVR : ObservableObject
     {
-        private HttpHelper HttpHelper { get; set; }
-
-        private readonly int IdLugar;
+        private readonly IWebService _webService;
 
         [ObservableProperty]
         private string _utilizationPlaceVR;
 
-        public InformationPlaceVR(string Id)
+        public InformationPlaceVR(IWebService webService)
         {
-            IdLugar = Convert.ToInt32(Id);
-            HttpHelper = new HttpHelper();
+            _webService = webService;
         }
 
-        public async Task GetInformationPlaceVRByIdPlace()
+        public async Task GetInformationPlaceVRByIdPlace(int id)
         {
-            var baseUrl = HttpHelper.GetBaseUrl();
-            var htppClient = await HttpHelper.GetHttpClient();
-
-            var url = $"{baseUrl}/Place/utilizationPlaceVR/{IdLugar}";
-
             try
             {
-                var response = await htppClient.GetAsync(url);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    UtilizationPlaceVR = response.Content.ReadAsStringAsync().Result;
-                }
+                UtilizationPlaceVR = await _webService.GetInformationPlaceVRByIdPlace(id);
             }
             catch (Exception)
             {
                 throw;
-                //Loading = "false";
-                //Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
         }
     }

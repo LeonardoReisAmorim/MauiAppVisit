@@ -9,8 +9,8 @@ public partial class PopupInfo : Popup
     public PopupInfo(string id)
 	{
 		InitializeComponent();
-        _informationPlaceVR = new InformationPlaceVR(id);
+        _informationPlaceVR = App.Current.Handler.MauiContext.Services.GetRequiredService<InformationPlaceVR>();
         BindingContext = _informationPlaceVR;
-        Task.Run(async () => await _informationPlaceVR.GetInformationPlaceVRByIdPlace());
+        Task.Run(async () => await _informationPlaceVR.GetInformationPlaceVRByIdPlace(Convert.ToInt32(id)));
     }
 }

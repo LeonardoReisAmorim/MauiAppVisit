@@ -9,13 +9,14 @@ public partial class Locations : ContentPage
     public Locations()
 	{
 		InitializeComponent();
-        _localItensViewModel = new LocalItensViewModel();
+        _localItensViewModel = App.Current.Handler.MauiContext.Services.GetRequiredService<LocalItensViewModel>();
         BindingContext = _localItensViewModel;  
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await _localItensViewModel.CarregaTipoDeLugaresAsync();
         await _localItensViewModel.CarregaLugaresAsync();
     }
 

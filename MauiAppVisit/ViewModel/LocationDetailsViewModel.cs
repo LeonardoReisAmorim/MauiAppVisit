@@ -1,21 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MauiAppVisit.Helpers;
 using MauiAppVisit.Model;
+using MauiAppVisit.WebServiceHttpClient;
 #if ANDROID
 using MauiAppVisit.Platforms.Android;
 #endif
 using System.IO.Compression;
-using System.Text.Json;
 using System.Windows.Input;
 
 namespace MauiAppVisit.ViewModel
 {
     public partial class LocationDetailsViewModel : ObservableObject
     {
-        private HttpHelper HttpHelper { get; set; }
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private readonly IWebService _webService;
 
-        private readonly int IdLugar;
         private int Idarquivo;
 
         [ObservableProperty]
@@ -39,45 +36,29 @@ namespace MauiAppVisit.ViewModel
         [ObservableProperty]
         private string _idLugarInfo;
 
-        public LocationDetailsViewModel(string Id)
+        public LocationDetailsViewModel(IWebService webService)
         {
-            IdLugar = Convert.ToInt32(Id);
-            HttpHelper = new HttpHelper();
+            _webService = webService;
             Loading = "true";
             Aviso = "";
-            _jsonSerializerOptions = JsonSerializeOptionHelper.Options;
         }
 
-        public async Task GetLocationDetailsById()
+        public async Task GetLocationDetailsById(int id)
         {
-            var baseUrl = HttpHelper.GetBaseUrl();
-            var htppClient = await HttpHelper.GetHttpClient();
-
-            var url = $"{baseUrl}/Place/{IdLugar}";
-
             try
             {
-                var response = await htppClient.GetAsync(url);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    using (var responseStream = await response.Content.ReadAsStreamAsync())
-                    {
-                        var data = await JsonSerializer.DeserializeAsync<List<Lugar>>(responseStream, _jsonSerializerOptions);
-
-                        Idarquivo = data[0].FileVRId;
-                        DescriptionPlace = data[0].Description;
-                        Nome = data[0].Name;
-                        ImagePlaceByte = Convert.FromBase64String(data[0].Image);
-                        IdLugarInfo = IdLugar.ToString();
+                var data = await _webService.GetLocationDetailsById(id);
+                Idarquivo = data[0].FileVRId;
+                DescriptionPlace = data[0].Description;
+                Nome = data[0].Name;
+                ImagePlaceByte = Convert.FromBase64String(data[0].Image);
+                IdLugarInfo = id.ToString();
 #if ANDROID
                         NameButton = AndroidUtils.HasAppInstalledButton(data[0].FileName) ? "INICIAR" : "BAIXAR";
 #endif
-                    }
-                    Loading = "false";
-                }
+                Loading = "false";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
@@ -88,73 +69,66 @@ namespace MauiAppVisit.ViewModel
 
         private async Task GetArquivoAsync()
         {
-            Loading = "true";
-            Aviso = "";
-            var baseUrl = HttpHelper.GetBaseUrl();
-            var httpClient = await HttpHelper.GetHttpClient();
-
             try
             {
-                FileVrDetails fileVrDetails = await RequestFileVrDetails(baseUrl, httpClient);
+                FileVrDetails fileVrDetails = await RequestFileVrDetails();
 
-                #if ANDROID
+#if ANDROID
                 bool processFileVR = AndroidUtils.ProcessFileVR(fileVrDetails);
 
                 if (!processFileVR)
                 {
-                    await RequestDownloadFileVR(baseUrl, httpClient, fileVrDetails);
+                    await RequestDownloadFileVR(fileVrDetails);
                     return;
                 }
-                #endif
+#endif
 
                 Loading = "false";
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 Loading = "false";
                 Aviso = "Servidor indisponível, por favor tente novamente mais tarde!";
             }
         }
 
-        private async Task RequestDownloadFileVR(string baseUrl, HttpClient httpClient, FileVrDetails fileVrDetails)
+        private async Task RequestDownloadFileVR(FileVrDetails fileVrDetails)
         {
-            string url = $"{baseUrl}/FileVR/{Idarquivo}";
-            var responseFile = await httpClient.GetAsync(url);
-
-            if (responseFile.IsSuccessStatusCode)
+            try
             {
-                var responseContent = await responseFile.Content.ReadAsStreamAsync();
+                var responseContent = await _webService.RequestDownloadFileVR(Idarquivo);
                 using (var arquivos = new ZipArchive(responseContent, ZipArchiveMode.Read))
                 {
-                    #if ANDROID
+#if ANDROID
                     AndroidUtils.GrantedPermission();
-                    #endif
+#endif
 
                     var arquivoApk = arquivos.Entries[0];
                     var streamAPK = arquivoApk.Open();
 
                     Loading = "false";
 
-                    #if ANDROID
+#if ANDROID
                     await AndroidUtils.DownloadApk(streamAPK, arquivoApk.Name.ToLower(), fileVrDetails);
-                    #endif
+#endif
                 }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        private async Task<FileVrDetails> RequestFileVrDetails(string baseUrl, HttpClient httpClient)
+        private async Task<FileVrDetails> RequestFileVrDetails()
         {
-            var url = $"{baseUrl}/FileVR/dadosArquivos/{Idarquivo}";
-            var responseDetailsFileVR = await httpClient.GetAsync(url);
-
-            if (responseDetailsFileVR.IsSuccessStatusCode)
+            try
             {
-                var responseContentFileVrDetailsStream = await responseDetailsFileVR.Content.ReadAsStringAsync();
-                var fileVrDetailsList = JsonSerializer.Deserialize<List<FileVrDetails>>(responseContentFileVrDetailsStream, _jsonSerializerOptions);
-                return fileVrDetailsList[0];
+                return await _webService.RequestFileVrDetails(Idarquivo);
             }
-
-            return new FileVrDetails();
+            catch(Exception)
+            {
+                throw;
+            }
         }
     }
 }

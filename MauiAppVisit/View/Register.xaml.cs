@@ -4,10 +4,10 @@ namespace MauiAppVisit.View;
 
 public partial class Register : ContentPage
 {
-	public Register()
+    public Register()
 	{
         InitializeComponent();
-        BindingContext = new UsuarioViewModel();
+        BindingContext = App.Current.Handler.MauiContext.Services.GetRequiredService<UsuarioViewModel>();
         BackgroundColor = Color.FromRgb(36, 87, 255);
     }
 
